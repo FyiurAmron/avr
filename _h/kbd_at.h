@@ -11,7 +11,7 @@
 #define KBD_DATA      ( 1 << KBD_DATA_PIN_NR )
 #define KBD_CLK_PIN   ( xPIN(KBD_CLK_LINE)  & KBD_CLK )
 #define KBD_DATA_PIN  ( xPIN(KBD_DATA_LINE) & KBD_DATA )
-#define KBD_DATA_BIT  ( KBD_DATA >> KBD_DATA_PIN_NR )
+#define KBD_DATA_BIT  ( KBD_DATA_PIN >> KBD_DATA_PIN_NR )
 
 #define KBD_TAB_LENGTH   4
 #define KBD_ERROR  0xFF
@@ -44,7 +44,7 @@ ISR(KBD_INT_VECT) {
         case 0:
             kbd.keyCode = 0;
             kbd.parityCnt = 0;
-            kbd.startBit = bit;
+            kbd.startBit = 0;
             break;
         case 9:
             kbd.parityBit = bit;
@@ -61,8 +61,8 @@ ISR(KBD_INT_VECT) {
 }
 
 void kbd_init( void ) {
-    xDDR(KBD_DATA_LINE) &=~ KBD_DATA;
-    xDDR(KBD_CLK_LINE)  &=~ KBD_CLK;
+    xDDR(KBD_DATA_LINE)  &=~KBD_DATA;
+    xDDR(KBD_CLK_LINE)   &=~KBD_CLK;
     xPORT(KBD_DATA_LINE) |= KBD_DATA; // open-collector needs pull-ups
     xPORT(KBD_DATA_LINE) |= KBD_CLK;  // open-collector needs pull-ups
 
@@ -97,6 +97,10 @@ uint8_t kbd_waitForKey( void ) {
 #else // !KBD_USE_INT
 
 void kbd_init( void ) {
+    xDDR(KBD_DATA_LINE)  &=~KBD_DATA;
+    xDDR(KBD_CLK_LINE)   &=~KBD_CLK;
+    xPORT(KBD_DATA_LINE) |= KBD_DATA; // open-collector needs pull-ups
+    xPORT(KBD_DATA_LINE) |= KBD_CLK;  // open-collector needs pull-ups
 }
 
 uint8_t kbd_waitForKey( void ) {

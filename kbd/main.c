@@ -47,9 +47,9 @@
 
 #include "../_miniapp/lis/lis.h"
 
-#define debug_printf(...)  printf(__VA_ARGS__)
+//#define debug_printf(...)  printf(__VA_ARGS__)
 //#define debug_printf(...)  do {} while(0)
-//#define debug_printf(...)  NOTHING
+#define debug_printf(...)  NOTHING
 
 void LCD_setDefaults( void );
 
@@ -142,7 +142,11 @@ int main( void ) {
                             break;
                         case '`':
                             _delay_ms( 200 );
+#ifdef KBD_USE_INT
                             lisuj( &(kbd.startBit) );
+#else
+                            lisuj( &isShift );
+#endif
                         case '\t':
                             putchar( key );
                             fputs( "    ", &LCD_output );
