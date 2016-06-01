@@ -1,0 +1,300 @@
+#define F_CPU  1000000UL
+//#define F_CPU 8000000UL
+
+#include <stdio.h>
+#include <avr/io.h>
+#include <util/delay.h>
+#include <avr/power.h>
+//#include <avr/cpufunc.h>
+
+#include "../_h/bits.h"
+#include "../_h/misc.h"
+
+//#define KEYPAD C /*A*/
+//#include "../_h/keypad.h"
+
+#define BAUD  9600
+#include "../_h/uart.h"
+
+#define FRAME_HEIGHT  8
+#define FRAME_WIDTH   4
+#define FRAME_LEN     (FRAME_HEIGHT * FRAME_WIDTH)
+
+static const uint8_t foxChars[] = {
+    0b00000, 0b00000, 0b00000, 0b00000,
+    0b00000, 0b10000, 0b00000, 0b00100,
+    0b01111, 0b11000, 0b00000, 0b11111,
+    0b11111, 0b11111, 0b11111, 0b11100,
+    0b00111, 0b10011, 0b11111, 0b11000,
+    0b00000, 0b00111, 0b00111, 0b10000,
+    0b00000, 0b01000, 0b00000, 0b01111,
+    0b00001, 0b10000, 0b00000, 0b00000,
+
+    0b00000, 0b00000, 0b00000, 0b00000,
+    0b01111, 0b10000, 0b00000, 0b00000,
+    0b11111, 0b11000, 0b00000, 0b11100,
+    0b00111, 0b11111, 0b11111, 0b11111,
+    0b00000, 0b00011, 0b11111, 0b11100,
+    0b00000, 0b00111, 0b00111, 0b10000,
+    0b00000, 0b11000, 0b00000, 0b01000,
+    0b00001, 0b00000, 0b00000, 0b00111,
+
+    0b11000, 0b00000, 0b00000, 0b00000,
+    0b11111, 0b10000, 0b00000, 0b00000,
+    0b01111, 0b11000, 0b00000, 0b11100,
+    0b00111, 0b11111, 0b11111, 0b11111,
+    0b00000, 0b00011, 0b11111, 0b11110,
+    0b00000, 0b00111, 0b00111, 0b10000,
+    0b00001, 0b11000, 0b00000, 0b01000,
+    0b00000, 0b00000, 0b00000, 0b00110,
+
+    0b11000, 0b00000, 0b00000, 0b00000,
+    0b11111, 0b10000, 0b00000, 0b00000,
+    0b11111, 0b11000, 0b00000, 0b11100,
+    0b00111, 0b11111, 0b11111, 0b11111,
+    0b00000, 0b00011, 0b11111, 0b11110,
+    0b00000, 0b00011, 0b00111, 0b10000,
+    0b00000, 0b00010, 0b00000, 0b01000,
+    0b00000, 0b00110, 0b00000, 0b00110,
+
+    0b00000, 0b00000, 0b00000, 0b00000,
+    0b01111, 0b10000, 0b00000, 0b00000,
+    0b11111, 0b11000, 0b00000, 0b01100,
+    0b01111, 0b11111, 0b11111, 0b11111,
+    0b00111, 0b10011, 0b11111, 0b11110,
+    0b00000, 0b00011, 0b10111, 0b10000,
+    0b00000, 0b00010, 0b00001, 0b00000,
+    0b00000, 0b00001, 0b10010, 0b00000,
+
+    0b00000, 0b00000, 0b00000, 0b00000,
+    0b00000, 0b10000, 0b00000, 0b00100,
+    0b00111, 0b11000, 0b00000, 0b11111,
+    0b11111, 0b11111, 0b11111, 0b11100,
+    0b01111, 0b10011, 0b11111, 0b11000,
+    0b00000, 0b00111, 0b00111, 0b10000,
+    0b00000, 0b01000, 0b00000, 0b01000,
+    0b00000, 0b10000, 0b00000, 0b01000,
+};
+
+static uint8_t charOut4[FRAME_WIDTH][FRAME_HEIGHT];
+
+void rotateChars4( const uint8_t* carr ) {
+    for( int8_t i = FRAME_LEN - 1; i >= 0; i-- ) {
+        charOut4[i%FRAME_WIDTH][i/FRAME_WIDTH] = carr[i];
+    }
+}
+
+#define LCD_DATA  A /*C*/
+#define LCD_CTRL  D
+#define LCD_RS  (1<< 6)
+#define LCD_RW  (1<< 5)
+#define LCD_E   (1<< 4)
+
+//#define LCD_USE_BUSY_FLAG
+#define LCD_4BIT
+#include "../_h/lcd_hd44780.h"
+
+#define KBD_ERROR  0xFF
+
+#define KBD_DATA_PIN_NUMBER  PD3
+static const uint8_t KBD_DATA = (1 << KBD_DATA_PIN_NUMBER);
+static const uint8_t KBD_CLK  = (1 << PD2);
+
+static const uint8_t KBD_CODE_MAP[] = ""
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿ\t`ÿ"
+"ÿÿÿÿÿq1ÿÿÿzsaw2ÿ"
+"ÿcxde43ÿÿ vftr5ÿ"
+"ÿnbhgy6ÿÿÿmju78ÿ"
+"ÿ,kio09ÿÿ./l;p-ÿ"
+"ÿÿ'ÿ[=ÿÿÿÿ\n]ÿ\\ÿÿ"
+"ÿÿÿÿÿÿ\bÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"";
+
+static const uint8_t KBD_CODE_MAP_SHIFT[] = ""
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿ\t~ÿ"
+"ÿÿÿÿÿQ!ÿÿÿZSAW@ÿ"
+"ÿCXDE$#ÿÿ VFTR%ÿ"
+"ÿNBHGY^ÿÿÿMJU&*ÿ"
+"ÿ<KIO)(ÿÿ>?L:P_ÿ"
+"ÿÿ\"ÿ{+ÿÿÿÿ\n}ÿ|ÿÿ"
+"ÿÿÿÿÿÿ\bÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ"
+"";
+ 
+
+#define SCREEN_LEN  16
+void LCD_setPosEx( uint8_t pos ) {
+    pos %= SCREEN_LEN;
+    if ( pos >= 8 ) {
+        pos += (LCD_LINE_2_OFFSET - 8);
+    }
+    LCD_setAddressDDRAM( pos );
+}
+
+int main( void ) {
+    init();
+
+    power_adc_disable();
+    //etc.
+    //ADCSRA = 0;
+    //xDDR(B) |= (1<< 0 ); // keypad status
+    //PORTB = 0;
+    DDRD &=~ KBD_DATA;
+    DDRD &=~ KBD_CLK;
+    PORTD |= KBD_DATA; // open-collector needs pull-ups
+    PORTD |= KBD_CLK; // open-collector needs pull-ups
+
+    //while(1) {} // to quickly disable uC code
+
+    uart_init();
+    uart_as_stdio();
+
+    // LCD control
+    LCD_preinit();
+    _delay_ms(50);
+    LCD_init4bit();
+    //LCD_setFunction( LCD_CMD_8_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
+    //LCD_setFunction( LCD_CMD_8_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
+    //_LCD_command( )
+    LCD_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );    
+    LCD_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
+    LCD_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_ON, LCD_CMD_CURSOR_BLINK_ON );
+    LCD_setEntryMode( LCD_CMD_EM_SHIFT_CURSOR, LCD_CMD_EM_INCREMENT );
+    LCD_clear();
+
+    puts("\n\rDevice started...\r");
+
+    uint8_t keyNum = KBD_ERROR, keyNumLast = 0xFE;
+    bool isShift = false;
+    uint8_t curPos = 0, curSubPos;
+
+    uint8_t frameCnt = sizeof(foxChars) / sizeof(foxChars[0]) / FRAME_LEN;
+    uint8_t frame = 0;
+
+    while(1) {
+        keyNum = getKeyPressed();
+        if ( keyNum == 0xE0 ) { // extended code
+            keyNum = getKeyPressed();
+            if ( keyNum == 0xF0 ) { // extended code
+                keyNum = getKeyPressed();
+                //printf( "break ext %x\n\r", keyNum );
+            } else {
+                //printf( "press ext %x\n\r", keyNum );
+            }
+        } else if ( keyNum == 0xE1 ) { // Pause
+            for( uint8_t i = 7; i > 0; i-- ) { // e1 14 77 e1 f0 14 f0 77
+                getKeyPressed();
+            } // don't bother checking them
+            //printf( "Pause\n\r" );
+        } else if ( keyNum == 0xF0 ) {
+            keyNum = getKeyPressed();
+            switch ( keyNum ) {
+                case 0x12:
+                case 0x59:
+                    isShift = false;
+                    break;
+            }
+            //printf( "break %x\n\r", keyNum );
+        } else { // regular code
+            //printf( "press %x\n\r", keyNum );
+            switch ( keyNum ) {
+                case 0x12:
+                case 0x59:
+                    isShift = true;
+                default: {
+                    uint8_t key = (isShift ? KBD_CODE_MAP_SHIFT : KBD_CODE_MAP)[keyNum];
+                    switch ( key ) {
+                        case KBD_ERROR:
+                            break;
+                        case '`':
+    LCD_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
+while(1) {
+        curSubPos = curPos;
+        LCD_setPosEx( curSubPos );
+        LCD_write( ' ' );
+        for( uint8_t i = 0; i < FRAME_WIDTH; i++ ) {
+            LCD_setPosEx( ++curSubPos );    
+            LCD_write( i );
+        }
+
+        //printf("frame: %d\n\r", frame % frameCnt );
+        rotateChars4( foxChars + FRAME_LEN * (frame % frameCnt) );
+
+        for( uint8_t i = 0; i < 4; i++ ) {
+            LCD_setCharacter( i, charOut4[i] );
+        }
+        frame++;
+        curPos++;
+
+            _delay_ms( 50 );
+                        }
+                        case '\t':
+                            putchar( key );
+                            LCD_write( ' ' );
+                            LCD_setPosEx( ++curPos );
+                            LCD_write( ' ' );
+                            LCD_setPosEx( ++curPos );
+                            LCD_write( ' ' );
+                            LCD_setPosEx( ++curPos );
+                            LCD_write( ' ' );
+                            LCD_setPosEx( ++curPos );
+                            break;
+                        case '\b':
+                            putchar( key );
+                            putchar( ' ' );
+                            putchar( key );
+                            LCD_setPosEx( --curPos );
+                            LCD_write( ' ' );
+                            LCD_setPosEx( curPos );
+                            break;
+                        case '\n':
+                            putchar( key );
+                            putchar( '\r' );
+                            LCD_clear();
+                            curPos = 0;
+                            LCD_setPosEx( curPos );
+                            break;
+                        default:
+                            putchar( key );
+                            LCD_write( key );
+                            LCD_setPosEx( ++curPos );
+                            break;
+                    }
+                    break;
+                }
+            }
+        }
+        //printf( BYTE2BIN_FORMAT"\n\r...\n\r", BYTE2BIN_ARG(xPIN(KEYPAD)) );
+        //printf( "%x ", keyNum );
+/*
+        if ( keyNum != NO_KEY_PRESSED ) {
+            //xPORT(B) |= (1<< 0 ); // keypad status
+            if ( keyNumLast != keyNum ) {
+                //printf( "%c", KEYPAD_KEYCODES3[keyNum] );
+                printf( "%x ", keyNum );
+                keyNumLast = keyNum;
+            }
+        } else {
+            keyNumLast = keyNum;
+            //xPORT(B) &=~(1<< 0 ); // keypad status
+        }
+*/
+    } // while(1)
+} // main()
