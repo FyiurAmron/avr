@@ -4,7 +4,7 @@
 #include <avr/wdt.h>
 #include "macro.h"
 
-#define soft_reset()  do { wdt_enable(WDTO_15MS); while(1) {} } while(0)
+#define soft_reset()  STATEMENT( wdt_enable(WDTO_15MS); while(1) {} )
 
 #define init()  MCUSR = 0; wdt_disable(); \
                 MCUCR = _BV( JTD ); MCUCR = _BV( JTD ); \

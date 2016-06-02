@@ -283,7 +283,8 @@ LDFLAGS += $(PRINTF_LIB) $(SCANF_LIB) $(MATH_LIB)
 AVRDUDE_PROGRAMMER = dapa
 
 # com1 = serial port. Use lpt1 to connect to parallel port.
-AVRDUDE_PORT = lpt1    # programmer connected to serial device
+AVRDUDE_PORT = lpt1
+# programmer connected to serial device
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 #AVRDUDE_WRITE_EEPROM = -U eeprom:w:$(TARGET).eep
@@ -296,7 +297,7 @@ AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
 
 # Uncomment the following if you do /not/ wish a verification to be
 # performed after programming the device.
-#AVRDUDE_NO_VERIFY = -V
+AVRDUDE_NO_VERIFY = -V
 
 # Increase verbosity level.  Please use this when submitting bug
 # reports about avrdude. See <http://savannah.nongnu.org/projects/avrdude> 

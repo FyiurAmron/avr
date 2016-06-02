@@ -11,6 +11,7 @@
 #define BAUD  9600
 #include <util/setbaud.h>
 //#undef USE2X
+// FIXME UART errors?
 #include "../../_h/uart.h"
 
 #include "../../_h/misc.h"
