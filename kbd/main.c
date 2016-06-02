@@ -131,9 +131,9 @@ int main( void ) {
                             LCD_setPosEx( --lcdPos );
                             break;
                         case '\n':
-                            fputs( "\n\r", stdout );
+                            fputs( "\n\r", &uart_output );
                             lcdTextBuffer[lcdPos] = 0;
-                            //printf("command issued: %s\n\r", lcdTextBuffer );
+                            //uart_printf("command issued: [%s]\n\r", lcdTextBuffer );
                             bool cls;
                             if( !strcmp( lcdTextBuffer, "cls" ) ) {
                                 cls = true;
