@@ -28,11 +28,11 @@
 #define FRAME_WIDTH   4
 #define FRAME_LEN     (FRAME_HEIGHT * FRAME_WIDTH)
 
-#define LCD_DATA_LINE  A /*C*/
-#define LCD_CTRL_LINE  D
-#define LCD_RS  (1<< 6)
-#define LCD_RW  (1<< 5)
-#define LCD_E   (1<< 4)
+#define LCD_DATA_LINE  A
+#define LCD_CTRL_LINE  A /*D*/
+#define LCD_RS  _BV(PA5) /*(1<< 6)*/
+#define LCD_RW  _BV(PA5)
+#define LCD_E   _BV(PA4)
 
 //#define LCD_USE_BUSY_FLAG
 #define LCD_4BIT

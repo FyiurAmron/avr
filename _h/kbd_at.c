@@ -1,9 +1,6 @@
 //
 #include "kbd_at.h"
 
-const uint8_t KBD_RX_WAITING = 11;
-const uint8_t KBD_RX_DONE = 0;
-
 bool kbd_intEnabled = false;
 uint8_t kbd_LEDs = 0;
 

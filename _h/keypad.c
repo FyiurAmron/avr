@@ -1,8 +1,6 @@
 //
 #include "keypad.h"
 
-const uint8_t KEYPAD_NO_KEY_PRESSED = 0xFF;
-
 PROGMEM const char * const KEYPAD_KEYCODES1 = "123A456B789C*0#D";
 PROGMEM const char * const KEYPAD_KEYCODES2 = "147*2580369#ABCD";
 PROGMEM const char * const KEYPAD_KEYCODES3 = "D#0*C987B654A321";

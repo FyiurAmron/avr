@@ -32,8 +32,8 @@
 #define kbd_debug_printf(...)  NOTHING
 #endif
 
-extern const uint8_t KBD_RX_WAITING;
-extern const uint8_t KBD_RX_DONE;
+#define KBD_RX_WAITING  11
+#define KBD_RX_DONE  0
 
 extern bool kbd_intEnabled;
 extern uint8_t kbd_LEDs;

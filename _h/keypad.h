@@ -34,7 +34,8 @@
 #  define KEYPAD_HIGH_END  7
 #endif
 
-extern const uint8_t KEYPAD_NO_KEY_PRESSED;
+#define KEYPAD_NO_KEY_PRESSED  0xFF
+
 extern PROGMEM const char * const KEYPAD_KEYCODE1;
 extern PROGMEM const char * const KEYPAD_KEYCODE2;
 extern PROGMEM const char * const KEYPAD_KEYCODE3;
