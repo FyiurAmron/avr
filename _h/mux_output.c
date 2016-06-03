@@ -1,6 +1,12 @@
 //
 #include "mux_output.h"
 
+FILE* mux_outputs[MUX_MAX];
+uint8_t mux_cnt;
+
+FILE _mux_output = FDEV_SETUP_STREAM( _mux_putchar_FDEV, NULL, _FDEV_SETUP_WRITE );
+FILE* const mux_output = &_mux_output;
+
 bool mux_add( FILE* output ) {
     if ( mux_cnt == MUX_MAX ) {
         return false;

@@ -34,17 +34,17 @@
 #  define KEYPAD_HIGH_END  7
 #endif
 
-const uint8_t KEYPAD_NO_KEY_PRESSED = 0xFF;
+extern const uint8_t KEYPAD_NO_KEY_PRESSED;
+extern PROGMEM const char * const KEYPAD_KEYCODE1;
+extern PROGMEM const char * const KEYPAD_KEYCODE2;
+extern PROGMEM const char * const KEYPAD_KEYCODE3;
+extern PROGMEM const char * const KEYPAD_KEYCODE4;
+extern PROGMEM PGM_P const KEYPAD_KEYCODES[];
 
-const uint8_t * const KEYPAD_KEYCODES1 = (uint8_t * const) "123A456B789C*0#D";
-const uint8_t * const KEYPAD_KEYCODES2 = (uint8_t * const) "147*2580369#ABCD";
-const uint8_t * const KEYPAD_KEYCODES3 = (uint8_t * const) "D#0*C987B654A321";
-const uint8_t * const KEYPAD_KEYCODES4 = (uint8_t * const) "DCBA#9630852*741";
+uint8_t keypad_get(void);
+uint8_t keypad_getChar( uint8_t keyCode, uint8_t keycodeSet );
 
-uint8_t getKeyPressed(void);
-uint8_t getKeyPressedInv(void);
-
-#ifdef SINGLE_FILE
+#ifdef COMPILE_SINGLE_FILE
 #include "keypad.c"
 #endif
 

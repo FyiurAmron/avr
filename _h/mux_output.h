@@ -6,16 +6,17 @@
 #define MUX_MAX  4
 #endif
 
-FILE* mux_outputs[MUX_MAX];
-uint8_t mux_cnt;
-
 bool mux_add( FILE* output );
 void mux_putchar( char c );
 int _mux_putchar_FDEV( char c, FILE *stream ); // internal
 
-FILE mux_output = FDEV_SETUP_STREAM( _mux_putchar_FDEV, NULL, _FDEV_SETUP_WRITE );
+extern FILE* mux_outputs[MUX_MAX];
+extern uint8_t mux_cnt;
 
-#ifdef SINGLE_FILE
+extern FILE _mux_output;
+extern FILE* const mux_output;
+
+#ifdef COMPILE_SINGLE_FILE
 #include "mux_output.c"
 #endif
 

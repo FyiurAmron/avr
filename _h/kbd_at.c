@@ -1,12 +1,18 @@
 //
 #include "kbd_at.h"
 
+const uint8_t KBD_RX_WAITING = 11;
+const uint8_t KBD_RX_DONE = 0;
+
+bool kbd_intEnabled = false;
+uint8_t kbd_LEDs = 0;
+
 uint8_t kbd_waitForKey_noInt( void ) {
     uint8_t bit, keyCode = 0, parityCalc = 0;
     while ( KBD_CLK_PIN ) {}
     if ( KBD_DATA_PIN ) {
-        //printf( "ERROR: KBD_DATA START not present\n\r" );
-        return KBD_ERROR;
+        kbd_debug_printf( "ERROR: KBD_DATA START not present\n\r" );
+        return KBD_RETURN_ON_ERROR;
     }
     while ( !KBD_CLK_PIN ) {}
     for( uint8_t i = 0; i < 8; i++ ) {
@@ -19,14 +25,14 @@ uint8_t kbd_waitForKey_noInt( void ) {
     while ( KBD_CLK_PIN ) {}
     bit = KBD_DATA_BIT;
     if ( (parityCalc % 2) == bit ) {
-        //printf( "ERROR: parity wrong\n\r" );
-        return KBD_ERROR;
+        kbd_debug_printf( "ERROR: parity wrong\n\r" );
+        return KBD_RETURN_ON_ERROR;
     }
     while ( !KBD_CLK_PIN ) {}
     while ( KBD_CLK_PIN ) {}
     if ( !KBD_DATA_PIN ) {
-        //printf( "ERROR: KBD_DATA STOP not present\n\r" );
-        return KBD_ERROR;
+        kbd_debug_printf( "ERROR: KBD_DATA STOP not present\n\r" );
+        return KBD_RETURN_ON_ERROR;
     }
     while ( !KBD_CLK_PIN ) {}
     return keyCode;
@@ -88,14 +94,6 @@ bool kbd_reset( void ) {
     return true;
 }
 
-#ifndef KBD_RETURN_ON_ERROR
-//#define KBD_RETURN_ON_ERROR  KBD_ERROR
-#define KBD_RETURN_ON_ERROR  kbd.keyCode
-#endif
-#ifndef kbd_debug_printf
-#define kbd_debug_printf(...)  NOTHING
-#endif
-
 uint8_t kbd_waitForKey( void ) {
     if ( !kbd_intEnabled ) {
         return kbd_waitForKey_noInt();
@@ -135,13 +133,13 @@ void _kbd_init_ports( void ) {
 }
 
 bool kbd_testEcho( void ) {
-    bool ret = kbd_sendCommand( KBD_ECHO ) && kbd_waitForKey() == KBD_ECHO;
+    bool ret = kbd_sendCommand( KBD2(ECHO) ) && kbd_waitForKey() == KBD2(ECHO);
     kbd_init_int();
     return ret;
 }
 
 uint16_t kbd_getId( void ) {
-    if ( !kbd_sendCommand( 0xF2 ) || kbd_waitForKey() != KBD_ACK ) {
+    if ( !kbd_sendCommand( KBD2(GET_ID) ) || kbd_waitForKey() != KBD2(ACK) ) {
         kbd_init_int();
         return 0xFFFF;
     }
@@ -153,9 +151,9 @@ uint16_t kbd_getId( void ) {
 }
 
 bool _kbd_setLEDs( uint8_t mask ) {
-    bool ret = kbd_sendCommand( 0xED ) && kbd_waitForKey() == KBD_ACK;
+    bool ret = kbd_sendCommand( KBD2(SET_LEDS) ) && kbd_waitForKey() == KBD2(ACK);
     if ( ret ) {
-        ret = kbd_sendCommand( mask ) && kbd_waitForKey() == KBD_ACK;
+        ret = kbd_sendCommand( mask ) && kbd_waitForKey() == KBD2(ACK);
     }
     kbd_init_int();
     return ret;
@@ -181,9 +179,9 @@ bool kbd_updateLEDs() {
 
 bool _kbd_reset( void ) {
     // expect ACK bit, full ACK & OK; short-circuit
-    bool ret = kbd_sendCommand( 0xFF )
-            && kbd_waitForKey() == KBD_ACK
-            && kbd_waitForKey() == 0xAA;
+    bool ret = kbd_sendCommand( KBD2(RESET) )
+            && kbd_waitForKey() == KBD2(ACK)
+            && kbd_waitForKey() == KBD2(RESET_OK);
     kbd_init_int();
     return ret;
 }

@@ -2,6 +2,7 @@
  *   LCD lib code
  */
 #include "lcd_hd44780.h"
+#include "lcd_hd44780_consts.c"
 
 void LCD_preinit( void ) {
     xDDR(LCD_CTRL_LINE) |= LCD_RW;

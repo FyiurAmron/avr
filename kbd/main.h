@@ -1,5 +1,5 @@
+#define COMPILE_SINGLE_FILE
 //#define DEBUG
-#define SINGLE_FILE
 
 #include "../_h/cpu.h"
 //#define F_CPU  1000000UL
@@ -36,6 +36,8 @@
 
 //#define LCD_USE_BUSY_FLAG
 #define LCD_4BIT
+#define LCD_PUTCHAR_RAW
+#define LCD_PUTCHAR_SAFE
 #include "../_h/lcd_hd44780.h"
 #include "../_h/lcd_hd44780_ex.h"
 
@@ -46,7 +48,7 @@
 
 #define KBD_USE_INT
 #include "../_h/kbd_at.h"
-#include "../_h/kbd_at_set2.h"
+#include "../_h/kbd_at_set2ex.h"
 
 #include "../_h/mux_output.h"
 
@@ -56,4 +58,5 @@
 
 void LCD_setDefaults( void );
 void LCD_fullInit( void );
+void kbd_cycleLEDs( void );
 void microTest( void );
