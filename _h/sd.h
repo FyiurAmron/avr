@@ -16,11 +16,17 @@
 #endif
 
 #ifndef SD_RETRIES_MAX
-#define SD_RETRIES_MAX            250
+#  ifdef SD_DEBUG
+#    define SD_RETRIES_MAX            10
+#  else
+#    define SD_RETRIES_MAX            250
 #endif
 
 #ifndef SD_SPI_RESPONSE_WAIT_MAX
-#define SD_SPI_RESPONSE_WAIT_MAX  250
+#  ifdef SD_DEBUG
+#    define SD_SPI_RESPONSE_WAIT_MAX  10
+#  else
+#    define SD_SPI_RESPONSE_WAIT_MAX  250
 #endif
 
 #define SD_RET_LEN_MAX         5
@@ -160,6 +166,8 @@
 #define ACMD49                 49
 #endif
 
+// common commands with CRCs:
+//
 // 40 00 00 00 00 95 (CMD 0)
 ///41 00 00 00 00 F9 (CMD 1)
 // 48 00 00 01 AA 87 (CMD 8)

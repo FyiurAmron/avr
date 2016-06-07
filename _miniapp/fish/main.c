@@ -1,6 +1,6 @@
 //#define F_CPU  1000000UL
 //#define F_CPU  8000000UL
-#include "../../_h/cpu.h"
+#include "vax/cpu.h"
 
 #include <stdio.h>
 #include <avr/io.h>
@@ -12,9 +12,9 @@
 #include <util/setbaud.h>
 //#undef USE2X
 // FIXME UART errors?
-#include "../../_h/uart.h"
+#include "vax/uart.h"
 
-#include "../../_h/misc.h"
+#include "vax/misc.h"
 
 #define LCD_DATA_LINE  A /*C*/
 #define LCD_CTRL_LINE  D
@@ -24,7 +24,7 @@
 #define LCD_E   (1<< 4)
 
 #define LCD_4BIT
-#include "../../_h/lcd_hd44780.h"
+#include "vax/lcd_hd44780.h"
 
 static const uint8_t charTri[] = {
     0b00100,

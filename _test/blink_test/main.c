@@ -3,8 +3,8 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "../../_h/misc.h"
-#include "../../_h/bits.h"
+#include "vax/misc.h"
+#include "vax/bits.h"
 
 #define TEST      C
 #define TEST_BIT  7

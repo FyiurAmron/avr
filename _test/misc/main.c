@@ -7,14 +7,14 @@
 #include <avr/power.h>
 //#include <avr/cpufunc.h>
 
-#include "../_h/bits.h"
-#include "../_h/misc.h"
+#include "vax/bits.h"
+#include "vax/misc.h"
 
 #define KEYPAD C /*A*/
-#include "../_h/keypad.h"
+#include "vax/keypad.h"
 
 #define BAUD  9600
-#include "../_h/uart.h"
+#include "vax/uart.h"
 
 #define LCD_DATA  A /*C*/
 #define LCD_CTRL  D
@@ -23,7 +23,7 @@
 #define LCD_RW  (1<< 5)
 #define LCD_E   (1<< 4)
 
-#include "../_h/lcd_hd44780.h"
+#include "vax/lcd_hd44780.h"
 
 static const uint8_t charTri[] = {
     0b00100,

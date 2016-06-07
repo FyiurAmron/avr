@@ -7,14 +7,14 @@
 #include <avr/power.h>
 //#include <avr/cpufunc.h>
 
-#include "../_h/bits.h"
-#include "../_h/misc.h"
+#include "vax/bits.h"
+#include "vax/misc.h"
 
 #define KEYPAD C /*A*/
-#include "../_h/keypad.h"
+#include "vax/keypad.h"
 
 #define BAUD  9600
-#include "../_h/uart.h"
+#include "vax/uart.h"
 
 #define LCD_DATA  A /*C*/
 #define LCD_CTRL  D
@@ -24,7 +24,7 @@
 
 //#define LCD_USE_BUSY_FLAG
 #define LCD_4BIT
-#include "../_h/lcd_hd44780.h"
+#include "vax/lcd_hd44780.h"
 
 #define FRAME_HEIGHT  8
 #define FRAME_WIDTH   4

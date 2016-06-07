@@ -1,7 +1,7 @@
 #define COMPILE_SINGLE_FILE
 //#define DEBUG
 
-#include "../_h/cpu.h"
+#include "vax/cpu.h"
 //#define F_CPU  1000000UL
 //#define F_CPU  8000000UL
 
@@ -14,7 +14,7 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 
-#include "../_h/misc.h"
+#include "vax/misc.h"
 
 //#define KEYPAD C
 //#include "../_h/keypad.h"
@@ -22,7 +22,7 @@
 #define BAUD  9600
 #include <util/setbaud.h>
 #undef USE_2X
-#include "../_h/uart.h"
+#include "vax/uart.h"
 
 #define FRAME_HEIGHT  8
 #define FRAME_WIDTH   4

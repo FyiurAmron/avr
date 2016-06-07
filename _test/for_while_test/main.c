@@ -9,7 +9,7 @@
 #include <avr/power.h>
 //#include <avr/cpufunc.h>
 
-#include "../_h/misc.h"
+#include "vax/misc.h"
 
 int main( void ) {
     uint8_t i;

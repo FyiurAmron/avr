@@ -7,14 +7,14 @@
 #include <avr/power.h>
 //#include <avr/cpufunc.h>
 
-#include "../_h/bits.h"
-#include "../_h/misc.h"
+#include "vax/bits.h"
+#include "vax/misc.h"
 
 #define KEYPAD C /*A*/
-#include "../_h/keypad.h"
+#include "vax/keypad.h"
 
 #define BAUD  9600
-#include "../_h/uart.h"
+#include "vax/uart.h"
 
 void blink_init( volatile uint8_t* where, uint8_t what ) {
     bit_set( where, what );
