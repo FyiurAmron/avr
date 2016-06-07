@@ -1,16 +1,21 @@
 #ifndef _MACRO_H
 #define _MACRO_H  1
+#include <stdint.h>
+#include <stdbool.h>
 
 #define NOTHING
 #define STATEMENT(x)  do { x } while(0)
 #define EMPTY_STATEMENT  STATEMENT(NOTHING)
 
-#define CONCAT2(x,y)  x ## y
-#define CONCAT(x,y)   CONCAT2(x,y)
+#define QUOTE0(x)     #x
+#define QUOTE(x)      QUOTE0(x)
+#define CONCAT0(x,y)  x ## y
+#define CONCAT(x,y)   CONCAT0(x,y)
+//#define EXPAND(x)     x
 
-#define xPORT(x)  CONCAT2(PORT,x)
-#define xDDR(x)   CONCAT2(DDR,x)
-#define xPIN(x)   CONCAT2(PIN,x)
+#define xPORT(x)  CONCAT(PORT,x)
+#define xDDR(x)   CONCAT(DDR,x)
+#define xPIN(x)   CONCAT(PIN,x)
 
 //#define _NOP()  do { __asm__ __volatile__ ("nop"); } while (0)
 #define _NOP()  STATEMENT( __asm__ __volatile__ ("nop"); )
@@ -30,9 +35,11 @@
 #define ESC  "\x1B"
 
 #ifdef DEBUG
-#define debug_printf(...)  printf(__VA_ARGS__)
+#define debug_printf(...)   printf( __VA_ARGS__ )
+#define debug_print_line()  printf( "dbg@%d ", __LINE__ );
 #else
-#define debug_printf(...)  EMPTY_STATEMENT
+#define debug_printf(...)   EMPTY_STATEMENT
+#define debug_print_line()  EMPTY_STATEMENT
 //#define debug_printf(...)  NOTHING
 #endif
 

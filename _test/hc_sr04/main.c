@@ -7,13 +7,13 @@ int main( void ) {
     //while(1) {} // to quickly disable uC code
 
     uart_init();
-    uart_as_stdio();
+    uart_stdio();
 
     uart_printf( "\n\r" );
     uart_printf( "* UART: OK\n\r" );
 
     while(1) {
-        uint16_t dist = dist_ping_hq();
+        uint16_t dist = dist_pingHQ();
         switch( dist ) {
             case DIST_SENSE_OUT_OF_RANGE:
                 printf( "\n\r dist out of range\n\r" );

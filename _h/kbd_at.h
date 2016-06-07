@@ -6,7 +6,6 @@
 #else
 
 #include "macro.h"
-#include <stdbool.h>
 #include "kbd_at_set2.h"
 
 #define KBD_CLK       ( 1 << KBD_CLK_PIN_NR )
@@ -40,8 +39,8 @@ extern uint8_t kbd_LEDs;
 
 uint8_t kbd_waitForKey( void );
 void kbd_init( void );
-void kbd_init_int( void );
-void _kbd_init_ports( void ); // internal
+void kbd_initInt( void );
+void _kbd_initPorts( void ); // internal
 bool _kbd_sendCommand( uint8_t cmd ); // internal
 bool kbd_sendCommand( uint8_t cmd );
 bool kbd_reset( void );

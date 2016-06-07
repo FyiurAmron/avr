@@ -4,7 +4,7 @@
 #include "lcd_hd44780.h"
 #include "lcd_hd44780_consts.c"
 
-void LCD_preinit( void ) {
+void lcd_preinit( void ) {
     xDDR(LCD_CTRL_LINE) |= LCD_RW;
     xDDR(LCD_CTRL_LINE) |= LCD_RS;
     xDDR(LCD_CTRL_LINE) |= LCD_E;
@@ -13,7 +13,7 @@ void LCD_preinit( void ) {
     xPORT(LCD_CTRL_LINE) &=~LCD_E;
 }
 
-void LCD_init4bit( void ) {
+void lcd_init4bit( void ) {
     xDDR(LCD_CTRL_LINE) |= LCD_RW;
     xDDR(LCD_CTRL_LINE) |= LCD_RS;
     xPORT(LCD_CTRL_LINE) &=~LCD_RW;
@@ -21,18 +21,18 @@ void LCD_init4bit( void ) {
     xDDR(LCD_DATA_LINE) |= 0x0F;
     xPORT(LCD_DATA_LINE) &= 0b11110000;
     xPORT(LCD_DATA_LINE) |= 0b00000011;
-    LCD_signalEnable();
+    lcd_signalEnable();
     _delay_ms(50);
 }
 
-void LCD_signalEnable( void ) {
+void lcd_signalEnable( void ) {
     xDDR(LCD_CTRL_LINE)  |= LCD_E;
     xPORT(LCD_CTRL_LINE) |= LCD_E;
     _delay_us(50);
     xPORT(LCD_CTRL_LINE) &=~LCD_E;
 }
 
-void LCD_setDataWrite( void ) {
+void lcd_setDataWrite( void ) {
     xDDR(LCD_CTRL_LINE) |= LCD_RW;
     xDDR(LCD_CTRL_LINE) |= LCD_RS;
     xPORT(LCD_CTRL_LINE) &=~LCD_RW;
@@ -44,7 +44,7 @@ void LCD_setDataWrite( void ) {
 #endif
 }
 
-void _LCD_setCommandMode( void ) {
+void _lcd_setCommandMode( void ) {
     xDDR(LCD_CTRL_LINE) |= LCD_RW;
     xDDR(LCD_CTRL_LINE) |= LCD_RS;
     xPORT(LCD_CTRL_LINE) &=~LCD_RW;
@@ -56,118 +56,118 @@ void _LCD_setCommandMode( void ) {
 #endif
 }
 
-void LCD_clear( void ) {
-    LCD_command( LCD_CMD_CLEAR );
+void lcd_clear( void ) {
+    lcd_command( LCD_CMD_CLEAR );
 }
 
-void LCD_setCharacter( uint8_t charCode, const uint8_t* data ) {
+void lcd_setCharacter( uint8_t charCode, const uint8_t* data ) {
     uint8_t oldAddr = LCD_getAddressDDRAM();
     uint8_t cmd = LCD_CMD_SET_CGRAM | ( (charCode << 3) & 0b00111000 );
     for( uint8_t i = 0; i < 8; i++ ) {
-        LCD_command( cmd | i );
-        LCD_putchar( *(data++) );
+        lcd_command( cmd | i );
+        lcd_putchar( *(data++) );
     }
 
-    LCD_command( LCD_CMD_SET_DDRAM | oldAddr );
+    lcd_command( LCD_CMD_SET_DDRAM | oldAddr );
 }
 
-void LCD_setAddressCGRAM( uint8_t address ) {
-    LCD_command( LCD_CMD_SET_CGRAM | ( address & 0b00111111 ) );
+void lcd_setAddressCGRAM( uint8_t address ) {
+    lcd_command( LCD_CMD_SET_CGRAM | ( address & 0b00111111 ) );
 }
 
-void LCD_setAddressDDRAM( uint8_t address ) {
-    LCD_command( LCD_CMD_SET_DDRAM | address );
+void lcd_setAddressDDRAM( uint8_t address ) {
+    lcd_command( LCD_CMD_SET_DDRAM | address );
 }
 
-void LCD_setPos1( uint8_t x ) {
-    LCD_setAddressDDRAM( x + LCD_LINE_1_OFFSET );
+void lcd_setPos1( uint8_t x ) {
+    lcd_setAddressDDRAM( x + LCD_LINE_1_OFFSET );
 }
 
-void LCD_setPos2( uint8_t x ) {
-    LCD_setAddressDDRAM( x + LCD_LINE_2_OFFSET );
+void lcd_setPos2( uint8_t x ) {
+    lcd_setAddressDDRAM( x + LCD_LINE_2_OFFSET );
 }
 
-void LCD_setPos3( uint8_t x ) {
-    LCD_setAddressDDRAM( x + LCD_LINE_3_OFFSET );
+void lcd_setPos3( uint8_t x ) {
+    lcd_setAddressDDRAM( x + LCD_LINE_3_OFFSET );
 }
 
-void LCD_setPos4( uint8_t x ) {
-    LCD_setAddressDDRAM( x + LCD_LINE_4_OFFSET );
+void lcd_setPos4( uint8_t x ) {
+    lcd_setAddressDDRAM( x + LCD_LINE_4_OFFSET );
 }
 
-void LCD_gotoLine1( void ) {
-    LCD_setAddressDDRAM( LCD_LINE_1_OFFSET );
+void lcd_gotoLine1( void ) {
+    lcd_setAddressDDRAM( LCD_LINE_1_OFFSET );
 }
 
-void LCD_gotoLine2( void ) {
-    LCD_setAddressDDRAM( LCD_LINE_2_OFFSET );
+void lcd_gotoLine2( void ) {
+    lcd_setAddressDDRAM( LCD_LINE_2_OFFSET );
 }
 
-void LCD_gotoLine3( void ) {
-    LCD_setAddressDDRAM( LCD_LINE_3_OFFSET );
+void lcd_gotoLine3( void ) {
+    lcd_setAddressDDRAM( LCD_LINE_3_OFFSET );
 }
 
-void LCD_gotoLine4( void ) {
-    LCD_setAddressDDRAM( LCD_LINE_4_OFFSET );
+void lcd_gotoLine4( void ) {
+    lcd_setAddressDDRAM( LCD_LINE_4_OFFSET );
 }
 
 #ifdef LCD_USE_BUSY_FLAG
-void LCD_waitShort( void ) {
+void lcd_waitShort( void ) {
     while( LCD_isBusy() ) {};
 }
 
-void LCD_waitLong( void ) {
+void lcd_waitLong( void ) {
     while( LCD_isBusy() ) {};
 }
 #else // LCD_USE_DELAY
-void LCD_waitShort( void ) {
+void lcd_waitShort( void ) {
     _delay_us(50);
 }
 
-void LCD_waitLong( void ) {
+void lcd_waitLong( void ) {
     _delay_ms(2);
 }
 #endif // LCD_USE_BUSY_FLAG
 
-void LCD_putchar( uint8_t byte ) {
-    LCD_setDataWrite();
-    _LCD_write( byte );
-    LCD_waitShort();
+void lcd_putchar( uint8_t byte ) {
+    lcd_setDataWrite();
+    _lcd_write( byte );
+    lcd_waitShort();
 }
 
-void _LCD_write( uint8_t byte ) {
+void _lcd_write( uint8_t byte ) {
 #ifdef LCD_4BIT
-    _LCD_write_4bit( byte );
+    _lcd_write_4bit( byte );
 #else // LCD_8BIT
-    _LCD_write_8bit( byte );
+    _lcd_write_8bit( byte );
 #endif // LCD_4BIT
 }
 
-void _LCD_write_4bit( uint8_t byte ) {
+void _lcd_write_4bit( uint8_t byte ) {
     xPORT(LCD_DATA_LINE) &= 0xF0;
     xPORT(LCD_DATA_LINE) |= (byte >> 4);
-    LCD_signalEnable();
+    lcd_signalEnable();
     xPORT(LCD_DATA_LINE) &= 0xF0;
     xPORT(LCD_DATA_LINE) |= (byte & 0x0F);
-    LCD_signalEnable();
+    lcd_signalEnable();
 }
 
-void _LCD_write_8bit( uint8_t byte ) {
+void _lcd_write_8bit( uint8_t byte ) {
     xPORT(LCD_DATA_LINE) = byte;
-    LCD_signalEnable();
+    lcd_signalEnable();
 }
 
-void LCD_printL( const char * str, uint8_t len ) {
+void lcd_printL( const char * str, uint8_t len ) {
     LCD_setDataWrite();
     while( len-- ) {
-        LCD_putchar( *(str++) );
+        lcd_putchar( *(str++) );
     }
 }
 
-void LCD_print( const char * str ) {
+void lcd_print( const char * str ) {
     LCD_setDataWrite();
     while( *str ) {
-        LCD_putchar( *(str++) );
+        lcd_putchar( *(str++) );
     }
 }
 
@@ -225,41 +225,41 @@ uint8_t LCD_read( void ) {
     ret = xPIN(LCD_DATA_LINE);
     xPORT(LCD_CTRL_LINE) &=~LCD_E;
 #endif // LCD_4BIT
-    LCD_waitShort();
+    lcd_waitShort();
     return ret;
 }
 
 uint8_t LCD_getAddressDDRAM( void ) {
-    return LCD_getBusyAndAddressDDRAM() & ~LCD_BUSY_BIT;
+    return lcd_getBusyAndAddressDDRAM() & ~LCD_BUSY_BIT;
 }
 
 bool LCD_isBusy( void ) {
-    return LCD_getBusyAndAddressDDRAM() & LCD_BUSY_BIT;
+    return lcd_getBusyAndAddressDDRAM() & LCD_BUSY_BIT;
 }
 
-void _LCD_command( uint8_t cmd, bool useBusyFlag ) {
-    _LCD_setCommandMode();
-    _LCD_write( cmd );
+void _lcd_command( uint8_t cmd, bool useBusyFlag ) {
+    _lcd_setCommandMode();
+    _lcd_write( cmd );
     if ( useBusyFlag ) {
-        while( LCD_isBusy() ) {}
+        while( lcd_isBusy() ) {}
     } else {
         if ( cmd == LCD_CMD_CLEAR || cmd == LCD_CMD_HOME ) {
-            LCD_waitLong();
+            lcd_waitLong();
         } else {
-            LCD_waitShort();
+            lcd_waitShort();
         }
     }
 }
 
-void LCD_command( uint8_t cmd ) {
+void lcd_command( uint8_t cmd ) {
 #ifdef LCD_USE_BUSY_FLAG
-    _LCD_command( cmd, true );
+    _lcd_command( cmd, true );
 #else // LCD_USE_DELAY
-    _LCD_command( cmd, false );
+    _lcd_command( cmd, false );
 #endif // LCD_USE_BUSY_FLAG
 }
 
-void LCD_setDisplay( bool displayOn, bool displayCursor, bool cursorBlink ) {
+void lcd_setDisplay( bool displayOn, bool displayCursor, bool cursorBlink ) {
     uint8_t cmd = cursorBlink ? ( LCD_CMD_SET_DISPLAY | LCD_CMD_CURSOR_BLINK_ON )
                               :   LCD_CMD_SET_DISPLAY;
     if ( displayCursor ) {
@@ -268,10 +268,10 @@ void LCD_setDisplay( bool displayOn, bool displayCursor, bool cursorBlink ) {
     if ( displayOn ) {
         cmd |= LCD_CMD_DISPLAY_ON;
     }
-    LCD_command( cmd );
+    lcd_command( cmd );
 }
 
-void LCD_setFunction( bool use8bits, bool use2lines, bool useLargeFont ) {
+void lcd_setFunction( bool use8bits, bool use2lines, bool useLargeFont ) {
     uint8_t cmd = use8bits ? ( LCD_CMD_SET_FUNCTION | LCD_CMD_8_BIT )
                            :   LCD_CMD_SET_FUNCTION;
     if ( use2lines ) {
@@ -280,23 +280,23 @@ void LCD_setFunction( bool use8bits, bool use2lines, bool useLargeFont ) {
     if ( useLargeFont ) {
         cmd |= LCD_CMD_FONT_LARGE;
     }
-    LCD_command( cmd );
+    lcd_command( cmd );
 }
 
-void LCD_setEntryMode( bool shiftDisplay, bool increment ) {
+void lcd_setEntryMode( bool shiftDisplay, bool increment ) {
     uint8_t cmd = shiftDisplay ? ( LCD_CMD_SET_ENTRY_MODE | LCD_CMD_SHIFT_DISPLAY )
                                :   LCD_CMD_SET_ENTRY_MODE;
     if ( increment ) {
         cmd |= LCD_CMD_EM_INCREMENT;
     }
-    LCD_command( cmd );
+    lcd_command( cmd );
 }
 
-void LCD_shift( int8_t offset, bool shiftDisplay ) {
+void lcd_shift( int8_t offset, bool shiftDisplay ) {
     if ( offset == 0 ) {
         return;
     }
-    _LCD_setCommandMode();
+    _lcd_setCommandMode();
     uint8_t cmd = LCD_CMD_SHIFT;
     if ( shiftDisplay ) {
         cmd |= LCD_CMD_SHIFT_DISPLAY;
@@ -308,37 +308,37 @@ void LCD_shift( int8_t offset, bool shiftDisplay ) {
     }
 #ifdef LCD_4BIT
     for( ; offset > 0; offset-- ) {
-        _LCD_write_4bit( cmd );
-        LCD_waitShort();
+        _lcd_write_4bit( cmd );
+        lcd_waitShort();
     }
 #else // LCD_8BIT
     xPORT(LCD_DATA_LINE) = cmd;
     for( ; offset > 0; offset-- ) {
-        LCD_signalEnable();
-        LCD_waitShort();
+        lcd_signalEnable();
+        lcd_waitShort();
     }
 #endif // LCD_4BIT
 }
 
-void LCD_shiftCursor( int8_t offset ) {
-    LCD_shift( offset, LCD_CMD_SHIFT_DISPLAY );
+void lcd_shiftCursor( int8_t offset ) {
+    lcd_shift( offset, LCD_CMD_SHIFT_DISPLAY );
 }
 
-void LCD_shiftDisplay( int8_t offset ) {
-    LCD_shift( offset, LCD_CMD_SHIFT_CURSOR );
+void lcd_shiftDisplay( int8_t offset ) {
+    lcd_shift( offset, LCD_CMD_SHIFT_CURSOR );
 }
 
-void LCD_setPos( uint8_t x, uint8_t y ) {
+void lcd_setPos( uint8_t x, uint8_t y ) {
     switch( y ) {
       case 1:
-        LCD_setPos1( x ); break;
+        lcd_setPos1( x ); break;
       case 2:
-        LCD_setPos2( x ); break;
+        lcd_setPos2( x ); break;
       case 3:
-        LCD_setPos3( x ); break;
+        lcd_setPos3( x ); break;
       case 4:
-        LCD_setPos4( x ); break;
+        lcd_setPos4( x ); break;
       default:
-        LCD_setPos1( x ); break;
+        lcd_setPos1( x ); break;
     }
 }

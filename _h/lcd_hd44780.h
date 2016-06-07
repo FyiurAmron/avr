@@ -8,7 +8,6 @@
 #error "missing one or more needed definitions: LCD_DATA_LINE, LCD_CTRL_LINE, LCD_RS, LCD_RW, LCD_E"
 #else
 
-#include <stdbool.h>
 #include "macro.h"
 
 // define LCD_RW == LCD_RS if RW is not connected;
@@ -60,48 +59,48 @@
 #define LCD_LINE_3_OFFSET          0x14
 #define LCD_LINE_4_OFFSET          0x54
 
-void LCD_preinit( void );
-void LCD_init4bit( void );
+void lcd_preinit( void );
+void lcd_init4bit( void );
 
-void LCD_signalEnable( void );
-void LCD_setDataWrite( void );
-void LCD_setDataRead( void );
-uint8_t LCD_getBusyAndAddressDDRAM( void );
-void _LCD_command( uint8_t cmd, bool useBusyFlag ); // internal
-void LCD_command( uint8_t cmd );
-void LCD_setDisplay( bool displayOn, bool displayCursor, bool cursorBlink );
-void LCD_setFunction( bool use8bits, bool use2lines, bool useLargeFont );
-void LCD_setEntryMode( bool shiftDisplay, bool increment );
-void LCD_shiftCursor( int8_t offset );
-void LCD_shiftDisplay( int8_t offset );
+void lcd_signalEnable( void );
+void lcd_setDataWrite( void );
+void lcd_setDataRead( void );
+uint8_t lcd_getBusyAndAddressDDRAM( void );
+void _lcd_command( uint8_t cmd, bool useBusyFlag ); // internal
+void lcd_command( uint8_t cmd );
+void lcd_setDisplay( bool displayOn, bool displayCursor, bool cursorBlink );
+void lcd_setFunction( bool use8bits, bool use2lines, bool useLargeFont );
+void lcd_setEntryMode( bool shiftDisplay, bool increment );
+void lcd_shiftCursor( int8_t offset );
+void lcd_shiftDisplay( int8_t offset );
 
-void _LCD_write_4bit( uint8_t bit8 ); // internal
-void _LCD_write_8bit( uint8_t bit8 ); // internal
-void _LCD_write( uint8_t byte ); // internal
-void LCD_putchar( uint8_t byte );
-void LCD_printL( const char * str, uint8_t len );
-void LCD_print( const char * str );
+void _lcd_write_4bit( uint8_t bit8 ); // internal
+void _lcd_write_8bit( uint8_t bit8 ); // internal
+void _lcd_write( uint8_t byte ); // internal
+void lcd_putchar( uint8_t byte );
+void lcd_printL( const char * str, uint8_t len );
+void lcd_print( const char * str );
 
-void LCD_waitShort( void );
-void LCD_waitLong( void );
-uint8_t LCD_read( void );
-uint8_t LCD_getAddressDDRAM( void );
-bool LCD_isBusy( void );
-void LCD_clear( void );
+void lcd_waitShort( void );
+void lcd_waitLong( void );
+uint8_t lcd_read( void );
+uint8_t lcd_getAddressDDRAM( void );
+bool lcd_isBusy( void );
+void lcd_clear( void );
 
-void LCD_setCharacter( uint8_t charCode, const uint8_t* data );
-void LCD_setAddressCGRAM( uint8_t address );
-void LCD_setAddressDDRAM( uint8_t address );
+void lcd_setCharacter( uint8_t charCode, const uint8_t* data );
+void lcd_setAddressCGRAM( uint8_t address );
+void lcd_setAddressDDRAM( uint8_t address );
 
-void LCD_setPos( uint8_t x, uint8_t y );
-void LCD_setPos1( uint8_t x );
-void LCD_setPos2( uint8_t x );
-void LCD_setPos3( uint8_t x );
-void LCD_setPos4( uint8_t x );
-void LCD_gotoLine1( void );
-void LCD_gotoLine2( void );
-void LCD_gotoLine3( void );
-void LCD_gotoLine4( void );
+void lcd_setPos( uint8_t x, uint8_t y );
+void lcd_setPos1( uint8_t x );
+void lcd_setPos2( uint8_t x );
+void lcd_setPos3( uint8_t x );
+void lcd_setPos4( uint8_t x );
+void lcd_gotoLine1( void );
+void lcd_gotoLine2( void );
+void lcd_gotoLine3( void );
+void lcd_gotoLine4( void );
 
 #ifdef COMPILE_SINGLE_FILE
 #include "lcd_hd44780.c"

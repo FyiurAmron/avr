@@ -2,6 +2,7 @@
 #define _MISC_H  1
 // misc utils
 #include <avr/wdt.h>
+#include <avr/io.h>
 #include "macro.h"
 
 #define soft_reset()  STATEMENT( wdt_enable(WDTO_15MS); while(1) {} )

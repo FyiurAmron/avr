@@ -27,7 +27,7 @@ uint8_t dist_ping( void ) {
     return DIST_SENSE_OUT_OF_RANGE;
 }
 
-uint16_t dist_ping_hq( void ) {
+uint16_t dist_pingHQ( void ) {
     xDDR(DIST_ECHO_LINE)  &=~DIST_ECHO;
     xPORT(DIST_ECHO_LINE) &=~DIST_ECHO; // input for ECHO
     if ( xPIN(DIST_ECHO_LINE) & DIST_ECHO ) { // assert that ECHO is low

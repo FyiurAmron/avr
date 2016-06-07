@@ -1,8 +1,8 @@
 #ifndef	_KEYPAD_H
 #define _KEYPAD_H  1
 // keypad read code
-
-#include "misc.h"
+#include <avr/pgmspace.h>
+#include "macro.h"
 
 #ifndef KEYPAD_IO_DELAY_TICKS
 #  define KEYPAD_IO_DELAY_TICKS  1
@@ -43,7 +43,7 @@ extern PROGMEM const char * const KEYPAD_KEYCODE4;
 extern PROGMEM PGM_P const KEYPAD_KEYCODES[];
 
 uint8_t keypad_get(void);
-uint8_t keypad_getChar( uint8_t keyCode, uint8_t keycodeSet );
+uint8_t keypad_getchar( uint8_t keyCode, uint8_t keycodeSet );
 
 #ifdef COMPILE_SINGLE_FILE
 #include "keypad.c"

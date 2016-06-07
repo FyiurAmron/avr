@@ -3,6 +3,7 @@
 /*
  *   HC-SR04 hi-freq soundwave distance sensor (SRF04-compatible)
  */
+#include "macro.h"
 
 #ifdef DIST_LINE
 #define DIST_TRIG_LINE    DIST_LINE
@@ -23,8 +24,8 @@
 #define DIST_DELAY_MAX_HQ  5000
 #endif
 
-#define DIST_TRIG        _BV(DIST_TRIG_PIN_NR)
-#define DIST_ECHO        _BV(DIST_ECHO_PIN_NR)
+#define DIST_TRIG        (1<< DIST_TRIG_PIN_NR)
+#define DIST_ECHO        (1<< DIST_ECHO_PIN_NR)
 
 #define DIST_SENSE_OUT_OF_RANGE  0xFF
 #define DIST_SENSE_HANG_UP       0xFE
@@ -33,7 +34,7 @@
 #define DIST_SENSE_HANG_UP_HQ       DIST_SENSE_HANG_UP ## DIST_SENSE_HANG_UP
 
 uint8_t dist_ping( void );
-uint16_t dist_ping_hq( void );
+uint16_t dist_pingHQ( void );
 
 #ifdef COMPILE_SINGLE_FILE
 #include "dist_hc_sr04.c"

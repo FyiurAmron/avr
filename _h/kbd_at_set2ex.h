@@ -7,7 +7,7 @@
 extern PROGMEM const char const KBD_CODE_MAP[];
 extern PROGMEM const char const KBD_CODE_MAP_SHIFT[];
 
-uint8_t kbd_set2_getChar( uint8_t keyCode, bool isShift );
+uint8_t kbd_set2_getchar( uint8_t keyCode, bool isShift );
 
 #ifdef COMPILE_SINGLE_FILE
 #include "kbd_at_set2ex.c"

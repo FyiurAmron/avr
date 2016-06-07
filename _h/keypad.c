@@ -13,7 +13,7 @@ PROGMEM const PGM_P const KEYPAD_KEYCODES[] = {
     KEYPAD_KEYCODES4,
 }
 
-inline uint8_t keypad_getChar( uint8_t keyCode, uint8_t keycodeSet ) {
+inline uint8_t keypad_getchar( uint8_t keyCode, uint8_t keycodeSet ) {
     return pgm_read_byte( KEYPAD_KEYCODES[keycodeSet] + keyCode );
 }
 

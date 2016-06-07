@@ -5,13 +5,13 @@
 //#include <stdint.h>
 #include <stdbool.h>
 
-void bit_set_to( volatile uint8_t* where, uint8_t what, bool value );
+void bit_setTo( volatile uint8_t* where, uint8_t what, bool value );
 void bit_set( volatile uint8_t* where, uint8_t what );
 void bit_clear( volatile uint8_t* where, uint8_t what );
 void bit_toggle( volatile uint8_t* where, uint8_t what );
 bool bit_is( volatile uint8_t* where, uint8_t what );
 
-inline void bit_set_to( volatile uint8_t* where, uint8_t what, bool value ) {
+inline void bit_setTo( volatile uint8_t* where, uint8_t what, bool value ) {
     if ( value ) {
 	    bit_set( where, what );
     } else {

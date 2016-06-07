@@ -1,11 +1,13 @@
 #ifndef _UART_H
 #define _UART_H  1
 // UART code
+#include <avr/io.h>
 
 void uart_init( void );
-void uart_as_stdio( void );
-char uart_getchar( void );
-void uart_putchar( char c );
+void uart_stdio( void );
+uint8_t uart_getchar( void );
+uint8_t uart_getcharEcho( void );
+void uart_putchar( uint8_t c );
 
 #ifndef UART_NO_STREAMS
 #define uart_printf(...)  fprintf( uart_output, __VA_ARGS__ )

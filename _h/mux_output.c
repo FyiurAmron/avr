@@ -16,7 +16,7 @@ bool mux_add( FILE* output ) {
     return true;
 }
 
-void mux_putchar( char c ) {
+void mux_putchar( uint8_t c ) {
     for( int8_t i = mux_cnt - 1; i >= 0; i-- ) {
         putc( c, mux_outputs[i] );
     }
@@ -24,5 +24,5 @@ void mux_putchar( char c ) {
 
 int _mux_putchar_FDEV( char c, FILE *stream ) {
     mux_putchar( c );
-    return 0;
+    return c;
 }

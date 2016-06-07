@@ -60,7 +60,7 @@ ISR(KBD_INT_VECT) {
     kbd.curBitNr++;
 }
 
-void kbd_init_int( void ) {
+void kbd_initInt( void ) {
    //EICRA |= 0b00; // on low
     EICRA |= 0b10; // on falling slope
     EIMSK |= (1 << KBD_INT);
@@ -71,7 +71,7 @@ void kbd_init_int( void ) {
     kbd.curBitNr = KBD_RX_DONE;
 }
 
-void kbd_disable_int( void ) {
+void kbd_disableInt( void ) {
     cli();
     kbd_intEnabled = false;
 }
@@ -87,7 +87,7 @@ bool kbd_reset( void ) {
         return false;
     }
     kbd_LEDs = 0;
-    kbd_init_int();
+    kbd_initInt();
     return true;
 }
 
@@ -116,13 +116,13 @@ uint8_t kbd_waitForKey( void ) {
 #else // !KBD_USE_INT
 
 #define kbd_reset       _kbd_reset
-#define kbd_init        _kbd_init_ports
+#define kbd_init        _kbd_initPorts
 #define kbd_waitForKey  kbd_waitForKey_noInt
 void kbd_init_int( void ) {}
 void kbd_disable_int( void ) {}
 #endif // KBD_USE_INT
 
-void _kbd_init_ports( void ) {
+void _kbd_initPorts( void ) {
     xDDR(KBD_DATA_LINE)  &=~KBD_DATA;
     xDDR(KBD_CLK_LINE)   &=~KBD_CLK;
     xPORT(KBD_DATA_LINE) |= KBD_DATA; // open-collector needs pull-ups
