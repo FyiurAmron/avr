@@ -41,7 +41,7 @@ void microTest( void ) {
 #ifdef LIS
     _delay_ms( 200 );
 #ifdef KBD_USE_INT
-    lisuj( &(kbd.startBit) );
+    lisuj( &(kbd_state.startBit) );
 #else
     bool foo = true;
     lisuj( &foo );
@@ -68,7 +68,7 @@ int main( void ) {
     bool isShift = false;
     uint8_t keyCode;
 
-    kbd.curBitNr = KBD_RX_DONE;
+    kbd_state.curBitNr = KBD_RX_DONE;
     while(1) {
         keyCode = kbd_waitForKey();
         if ( keyCode == KBD2(EXT) ) { // extended code

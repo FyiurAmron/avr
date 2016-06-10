@@ -4,9 +4,19 @@
 #include <stdint.h>
 #include "spi.h"
 
+#define SD_HC_BLOCK_LENGTH  512
+
 #ifndef SD_INIT_IDLE_CYCLES
 #define SD_INIT_IDLE_CYCLES  10
 // idle for 10 bytes => 80 clocks (74 required by spec)
+#endif
+
+#ifndef SD_INIT_IF_COND_ECHO // CMD8 echoes last arg
+#define SD_INIT_IF_COND_ECHO  0xAA
+#endif
+
+#ifndef SD_INIT_IF_COND_VOLTAGE // CMD8 echoes voltage if supported
+#define SD_INIT_IF_COND_VOLTAGE  0x01
 #endif
 
 #ifdef SD_DEBUG
@@ -15,31 +25,39 @@
 #define sd_debug_printf(...)  EMPTY_STATEMENT
 #endif
 
-#ifndef SD_RETRIES_MAX
-#  ifdef SD_DEBUG
-#    define SD_RETRIES_MAX            10
-#  else
-#    define SD_RETRIES_MAX            250
+#ifndef SD_INIT_RETRIES_MAX
+#define SD_INIT_RETRIES_MAX            250  // note the uint8_t's limit (255)
 #endif
 
-#ifndef SD_SPI_RESPONSE_WAIT_MAX
-#  ifdef SD_DEBUG
-#    define SD_SPI_RESPONSE_WAIT_MAX  10
-#  else
-#    define SD_SPI_RESPONSE_WAIT_MAX  250
+#ifndef SD_SPI_RESPONSE_WAIT_MAX // Ncr (command response time) is defined as 8 bytes max BTW
+#define SD_SPI_RESPONSE_WAIT_MAX  8
 #endif
 
 #define SD_RET_LEN_MAX         5
 
 #define SD_RET_READY           0
-#define SD_RET_IDLE            ( 1<< 0 )
-#define SD_RET_ERASE_RESET     ( 1<< 1 )
-#define SD_RET_ILLEGAL_CMD     ( 1<< 2 )
-#define SD_RET_CRC_ERROR       ( 1<< 3 )
-#define SD_RET_ERASE_SEQ_ERR   ( 1<< 4 )
-#define SD_RET_ADDRESS_ERR     ( 1<< 5 )
-#define SD_RET_PARAM_ERR       ( 1<< 6 )
-#define SD_RET_ZERO_START_BIT  ( 1<< 7 )
+#define SD_R1_READY            SD_RET_READY
+#define SD_R1_IN_IDLE_STATE    BV(0)
+#define SD_R1_ERASE_RESET      BV(1)
+#define SD_R1_ILLEGAL_CMD      BV(2)
+#define SD_R1_CRC_ERROR        BV(3)
+#define SD_R1_ERASE_SEQ_ERR    BV(4)
+#define SD_R1_ADDRESS_ERR      BV(5)
+#define SD_R1_PARAM_ERR        BV(6)
+#define SD_R1_ZERO_START_BIT   BV(7)
+
+#define SD_R2_READY            SD_RET_READY
+#define SD_R2_CARD_LOCKED      BV(0)
+#define SD_R2_WP_ERASE_SKIP    BV(1)
+#define SD_R2_LOCK_UNLOCK_FAILED  SD_R2_WP_ERASE_SKIP
+#define SD_R2_ERROR            BV(2)
+#define SD_R2_INTERNAL_ERROR   SD_R2_ERROR
+#define SD_R2_CC_ERROR         BV(3)
+#define SD_R2_CARD_ECC_FAILED  BV(4)
+#define SD_R2_WP_VIOLATION     BV(5)
+#define SD_R2_ERASE_PARAM      BV(6)
+#define SD_R2_OUT_OF_RANGE     BV(7)
+#define SD_R2_CSD_OVERWRITE    SD_R2_OUT_OF_RANGE
 
 #define SD_INIT_NO_ERROR       0xFF
 
@@ -153,18 +171,22 @@
 
 //// SD Security ACMD
 #ifdef SD_SECURITY
-#define ACMD18                 18
-#define ACMD25                 25
-#define ACMD26                 26
-#define ACMD38                 38
-#define ACMD43                 43
-#define ACMD44                 44
-#define ACMD45                 45
-#define ACMD46                 46
-#define ACMD47                 47
-#define ACMD48                 48
-#define ACMD49                 49
+#define SD_ACMD18              18
+#define SD_ACMD25              25
+#define SD_ACMD26              26
+#define SD_ACMD38              38
+#define SD_ACMD43              43
+#define SD_ACMD44              44
+#define SD_ACMD45              45
+#define SD_ACMD46              46
+#define SD_ACMD47              47
+#define SD_ACMD48              48
+#define SD_ACMD49              49
 #endif
+
+#define SD_DATA_TOKEN              0b11111110
+#define SD_DATA_TOKEN_WRITE_MULTI  0b11111110
+#define SD_STOP_TRAN_TOKEN         0b11111101
 
 // common commands with CRCs:
 //
@@ -176,7 +198,6 @@
 // 69 40 00 00 00 77 (ACMD 41, HCS)
 
 uint8_t sd_initEx( uint8_t* retBuf, bool useHcs );
-uint8_t sd_init( void );
 uint8_t _sd_legacy_cmd1_init( uint8_t* retBuf );
 uint8_t sd_commandEx( uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2, uint8_t arg3, uint8_t crc, uint8_t* retBuf );
 void sd_preinit( void );

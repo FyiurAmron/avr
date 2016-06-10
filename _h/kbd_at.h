@@ -8,15 +8,15 @@
 #include "macro.h"
 #include "kbd_at_set2.h"
 
-#define KBD_CLK       ( 1 << KBD_CLK_PIN_NR )
-#define KBD_DATA      ( 1 << KBD_DATA_PIN_NR )
-#define KBD_CLK_PIN   ( xPIN(KBD_CLK_LINE)  & KBD_CLK )
-#define KBD_DATA_PIN  ( xPIN(KBD_DATA_LINE) & KBD_DATA )
+#define KBD_CLK       BV(KBD_CLK_PIN_NR)
+#define KBD_DATA      BV(KBD_DATA_PIN_NR)
+#define KBD_CLK_PIN   bit8_and( KBD_CLK_LINE, KBD_CLK )
+#define KBD_DATA_PIN  bit8_and( KBD_DATA_LINE, KBD_DATA )
 #define KBD_DATA_BIT  ( KBD_DATA_PIN >> KBD_DATA_PIN_NR )
 
-#define KBD_LED_SCROLL_LOCK  0x01
-#define KBD_LED_NUM_LOCK     0x02
-#define KBD_LED_CAPS_LOCK    0x04
+#define KBD_LED_SCROLL_LOCK  BV(0)
+#define KBD_LED_NUM_LOCK     BV(1)
+#define KBD_LED_CAPS_LOCK    BV(2)
 
 #ifndef KBD_INT
 #define KBD_INT       INT0
@@ -25,14 +25,14 @@
 
 #ifndef KBD_RETURN_ON_ERROR
 //#define KBD_RETURN_ON_ERROR  KBD2(ERROR)
-#define KBD_RETURN_ON_ERROR  kbd.keyCode
+#define KBD_RETURN_ON_ERROR  kbd_State.keyCode
 #endif
 #ifndef kbd_debug_printf
 #define kbd_debug_printf(...)  NOTHING
 #endif
 
 #define KBD_RX_WAITING  11
-#define KBD_RX_DONE  0
+#define KBD_RX_DONE     0
 
 extern bool kbd_intEnabled;
 extern uint8_t kbd_LEDs;
@@ -55,9 +55,9 @@ bool kbd_updateLEDs( void );
 typedef struct {
     volatile uint8_t curBitNr, keyCode;
     volatile uint8_t parityBit, parityCnt, startBit, stopBit;
-} kbd_t;
+} kbd_State;
 
-kbd_t kbd;
+kbd_State kbd_state;
 #endif
 
 #ifdef COMPILE_SINGLE_FILE

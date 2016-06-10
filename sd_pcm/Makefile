@@ -160,7 +160,6 @@ CFLAGS += -fwhole-program
 CFLAGS += -Wall
 CFLAGS += -Wstrict-prototypes
 CFLAGS += -mcall-prologues
-#CFLAGS += -E
 #CFLAGS += -mint8
 #CFLAGS += -mshort-calls
 #CFLAGS += -fno-unit-at-a-time
@@ -357,7 +356,6 @@ REMOVE = rm -f
 REMOVEDIR = rm -rf
 COPY = cp
 WINSHELL = cmd
-POWERSHELL = ps
 
 
 # Define Messages
@@ -456,7 +454,7 @@ gccversion :
 # Program the device.  
 program: $(TARGET).hex $(TARGET).eep
 	$(AVRDUDE) $(AVRDUDE_FLAGS) $(AVRDUDE_WRITE_FLASH) $(AVRDUDE_WRITE_EEPROM)
- 
+
 # Generate avr-gdb config/init file which does the following:
 #     define the reset signal, load the target file, connect to target, and set 
 #     a breakpoint at main().

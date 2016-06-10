@@ -18,10 +18,7 @@
 
 #include "vax/misc.h"
 
-#define BAUD  9600
-#include <util/setbaud.h>
-#undef USE_2X
-#define UART_INPUT_ECHO
+//#define UART_INPUT_ECHO
 #include "vax/uart.h"
 
 #define SPI_SCK_LINE     B

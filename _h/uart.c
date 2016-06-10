@@ -32,17 +32,18 @@ void uart_init( void ) {
     UBRR0L = UBRRL_VALUE;
 
 #ifdef USE_2X
-    UCSR0A |= _BV(U2X0);
+    bit8_set( UCSR0A, BV(U2X0) );
 #else
-    UCSR0A &=~(_BV(U2X0));
+    bit8_clear( UCSR0A, BV(U2X0) );
 #endif
 
     // default settings: async, 8-N-1 ; override by setting UCSR0C/UCSR0B
-    UCSR0B = _BV(RXEN0) | _BV(TXEN0);
+    UCSR0B  = BV(RXEN0);
+    bit8_set( UCSR0B, BV(TXEN0) );
 }
 
 uint8_t uart_getchar( void ) {
-    loop_until_bit_is_set( UCSR0A, RXC0 ); // until RX buffer ready (nonempty)
+    while ( !bit8_and( UCSR0A, BV(RXC0) ) ) { /* until RX buffer ready (nonempty) */ }
     return UDR0;
 }
 
@@ -53,6 +54,6 @@ uint8_t uart_getcharEcho( void ) {
 }
 
 void uart_putchar( uint8_t c ) {
-    loop_until_bit_is_set( UCSR0A, UDRE0 ); // until TX buffer ready (has space for input)
+    while ( !bit8_and( UCSR0A, BV(UDRE0) ) ) { /* until TX buffer ready (has space for input) */ }
     UDR0 = c;
 }

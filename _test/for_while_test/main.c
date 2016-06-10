@@ -16,24 +16,24 @@ int main( void ) {
     while(1){
 
         for(i = 10; i >= 0; i-- ) {
-            _NOP();
+            ASM_NOP();
         } 
 
 /*
         for(i = 0; i < 11; i++) {
-            _NOP();
+            ASM_NOP();
         }
 */
 /*
         i = 10;
         do {
-            _NOP();
+            ASM_NOP();
         } while ( i-- );
 */
 /*
         i = 11;
         while(i--> 0) {
-            _NOP();
+            ASM_NOP();
         } 
 */
     }

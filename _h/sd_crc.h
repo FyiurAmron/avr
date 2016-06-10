@@ -23,7 +23,7 @@ PROGMEM uint8_t SD_CRC_LOOKUP[] = {
     0x0E, 0x07, 0x1C, 0x15, 0x2A, 0x23, 0x38, 0x31, 0x46, 0x4F, 0x54, 0x5D, 0x62, 0x6B, 0x70, 0x79, 
 };
 
-#define sd_CRC_shift(x)                      ( (uint8_t)( x << 1 ) | 1 )
+#define sd_CRC_shift(x)                      ( (uint8_t)((uint8_t)( x << 1 ) | 1 ) )
 //#define sd_CRC_byte(x,y)                     sd_CRC_shift( CRC_byte( x, y ) )
 #define sd_CRC_bytes(...)                    sd_CRC_shift( CRC_bytes( __VA_ARGS__, 5 ) )
 #define sd_CRC(cmd, arg0, arg1, arg2, arg3)  \

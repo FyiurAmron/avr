@@ -19,9 +19,6 @@
 //#define KEYPAD C
 //#include "../_h/keypad.h"
 
-#define BAUD  9600
-#include <util/setbaud.h>
-#undef USE_2X
 #include "vax/uart.h"
 
 #define FRAME_HEIGHT  8
@@ -30,9 +27,9 @@
 
 #define LCD_DATA_LINE  A
 #define LCD_CTRL_LINE  A /*D*/
-#define LCD_RS  _BV(PA5) /*(1<< 6)*/
-#define LCD_RW  _BV(PA5)
-#define LCD_E   _BV(PA4)
+#define LCD_RS  BV(PA5)
+#define LCD_RW  BV(PA5)
+#define LCD_E   BV(PA4)
 
 //#define LCD_USE_BUSY_FLAG
 #define LCD_4BIT

@@ -18,9 +18,9 @@
 
 #include "vax/misc.h"
 
-#define BAUD  9600
+#define BAUD  115200
 #include <util/setbaud.h>
-#undef USE_2X
+//#undef USE_2X
 #include "vax/uart.h"
 
 #define SPI_SCK_LINE     B
@@ -33,4 +33,8 @@
 #define SPI_SS_PIN_NR    4
 
 #define SD_DEBUG
-#include "../_h/sd.h"
+#include "vax/sd.h"
+
+#include "vax/fat.h"
+#include "vax/intconv.h"
+#include "vax/debug.h"

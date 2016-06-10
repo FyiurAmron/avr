@@ -24,8 +24,8 @@
 #define DIST_DELAY_MAX_HQ  5000
 #endif
 
-#define DIST_TRIG        (1<< DIST_TRIG_PIN_NR)
-#define DIST_ECHO        (1<< DIST_ECHO_PIN_NR)
+#define DIST_TRIG        BV(DIST_TRIG_PIN_NR)
+#define DIST_ECHO        BV(DIST_ECHO_PIN_NR)
 
 #define DIST_SENSE_OUT_OF_RANGE  0xFF
 #define DIST_SENSE_HANG_UP       0xFE

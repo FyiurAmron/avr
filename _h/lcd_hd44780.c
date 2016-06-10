@@ -5,52 +5,55 @@
 #include "lcd_hd44780_consts.c"
 
 void lcd_preinit( void ) {
-    xDDR(LCD_CTRL_LINE) |= LCD_RW;
-    xDDR(LCD_CTRL_LINE) |= LCD_RS;
-    xDDR(LCD_CTRL_LINE) |= LCD_E;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RW;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RS;
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    bit8_set( xDDR(LCD_CTRL_LINE), LCD_RW;
+    bit8_set( xDDR(LCD_CTRL_LINE), LCD_RS;
+    bit8_set( xDDR(LCD_CTRL_LINE), LCD_E;
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RW );
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RS );
+    _lcd_enableOff();
 }
 
 void lcd_init4bit( void ) {
-    xDDR(LCD_CTRL_LINE) |= LCD_RW;
-    xDDR(LCD_CTRL_LINE) |= LCD_RS;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RW;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RS;
-    xDDR(LCD_DATA_LINE) |= 0x0F;
-    xPORT(LCD_DATA_LINE) &= 0b11110000;
-    xPORT(LCD_DATA_LINE) |= 0b00000011;
+/*
+    bit8_set( xDDR(LCD_CTRL_LINE), LCD_RW;
+    bit8_set( xDDR(LCD_CTRL_LINE), LCD_RS;
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RW );
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RS );
+*/
+// we assume this follows lcd_preinit()
+    bit8_set( xDDR(LCD_DATA_LINE), 0x0F );
+    bit8_clear( xPORT(LCD_DATA_LINE), 0x0F );
+    bit8_set( xPORT(LCD_DATA_LINE), 0b00000011 );
     lcd_signalEnable();
     _delay_ms(50);
 }
 
 void lcd_signalEnable( void ) {
-    xDDR(LCD_CTRL_LINE)  |= LCD_E;
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_E );
+    _lcd_enableOn();
     _delay_us(50);
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    _lcd_enableOff();
 }
 
 void lcd_setDataWrite( void ) {
-    xDDR(LCD_CTRL_LINE) |= LCD_RW;
-    xDDR(LCD_CTRL_LINE) |= LCD_RS;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RW;
-    xPORT(LCD_CTRL_LINE) |= LCD_RS;
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RW );
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RS );
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RW );
+    bit8_set( xPORT(LCD_CTRL_LINE), LCD_RS );
 #ifdef LCD_4BIT
-    xDDR(LCD_DATA_LINE) |= 0x0F;
+    bit8_set( xDDR(LCD_DATA_LINE), 0x0F );
 #else
     xDDR(LCD_DATA_LINE) = 0xFF;
 #endif
 }
 
 void _lcd_setCommandMode( void ) {
-    xDDR(LCD_CTRL_LINE) |= LCD_RW;
-    xDDR(LCD_CTRL_LINE) |= LCD_RS;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RW;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RS;
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RW );
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RS );
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RW );
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RS );
 #ifdef LCD_4BIT
-    xDDR(LCD_DATA_LINE) |= 0x0F;
+    bit8_set( xDDR(LCD_DATA_LINE), 0x0F );
 #else
     xDDR(LCD_DATA_LINE) = 0xFF;
 #endif
@@ -144,11 +147,11 @@ void _lcd_write( uint8_t byte ) {
 }
 
 void _lcd_write_4bit( uint8_t byte ) {
-    xPORT(LCD_DATA_LINE) &= 0xF0;
-    xPORT(LCD_DATA_LINE) |= (byte >> 4);
+    bit8_clear( xDDR(LCD_DATA_LINE), 0x0F ); // clear 2nd nibble
+    bit8_set( xPORT(LCD_DATA_LINE), byte >> 4 );
     lcd_signalEnable();
-    xPORT(LCD_DATA_LINE) &= 0xF0;
-    xPORT(LCD_DATA_LINE) |= (byte & 0x0F);
+    bit8_clear( xDDR(LCD_DATA_LINE), 0x0F ); // clear 2nd nibble
+    bit8_set( xPORT(LCD_DATA_LINE), bit8_and( byte, 0x0F ) );
     lcd_signalEnable();
 }
 
@@ -172,69 +175,69 @@ void lcd_print( const char * str ) {
 }
 
 uint8_t LCD_getBusyAndAddressDDRAM( void ) {
-    xDDR(LCD_CTRL_LINE) |= LCD_RW;
-    xDDR(LCD_CTRL_LINE) |= LCD_RS;
-    xPORT(LCD_CTRL_LINE) |= LCD_RW;
-    xPORT(LCD_CTRL_LINE) &=~LCD_RS;
-    xDDR(LCD_CTRL_LINE)  |= LCD_E;
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RW );
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RS );
+    bit8_set( xPORT(LCD_CTRL_LINE), LCD_RW );
+    bit8_clear( xPORT(LCD_CTRL_LINE), LCD_RS );
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_E );
     uint8_t ret;
 #ifdef LCD_4BIT
-    xDDR(LCD_DATA_LINE) &= 0xF0;
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    bit8_clear( xDDR(LCD_DATA_LINE), 0x0F ); // clear 2nd nibble
+    _lcd_enableOn();
     _delay_us(50);
-    ret = ( xPIN(LCD_DATA_LINE) & 0x0F ) << 4;
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    ret = bit8_and( xPIN(LCD_DATA_LINE), 0x0F ) << 4;
+    _lcd_enableOff();
     _delay_us(50);
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    _lcd_enableOn();
     _delay_us(50);
-    ret |= ( xPIN(LCD_DATA_LINE) & 0x0F );
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    bit8_set( ret, bit8_and( xPIN(LCD_DATA_LINE), 0x0F ) );
+    _lcd_enableOff();
 #else
     xDDR(LCD_DATA_LINE) = 0x00;
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    _lcd_enableOn();
     _delay_us(50);
     ret = xPIN(LCD_DATA_LINE);
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    _lcd_enableOff();
 #endif // LCD_4BIT
     _delay_us(50);
     return ret;
 }
 
 uint8_t LCD_read( void ) {
-    xDDR(LCD_CTRL_LINE) |= LCD_RW;
-    xDDR(LCD_CTRL_LINE) |= LCD_RS;
-    xPORT(LCD_CTRL_LINE) |= LCD_RW;
-    xPORT(LCD_CTRL_LINE) |= LCD_RS;
-    xDDR(LCD_CTRL_LINE)  |= LCD_E;
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RW );
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_RS );
+    bit8_set( xPORT(LCD_CTRL_LINE), LCD_RW );
+    bit8_set( xPORT(LCD_CTRL_LINE), LCD_RS );
+    //bit8_set( xDDR(LCD_CTRL_LINE), LCD_E );
     uint8_t ret;
 #ifdef LCD_4BIT
-    xDDR(LCD_DATA_LINE) &= 0xF0;
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    bit8_clear( xDDR(LCD_DATA_LINE), 0x0F ); // clear 2nd nibble
+    _lcd_enableOn();
     _delay_us(50);
-    ret = ( xPIN(LCD_DATA_LINE) & 0x0F ) << 4;
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    ret = bit8_and( xPIN(LCD_DATA_LINE), 0x0F ) << 4;
+    _lcd_enableOff();
     LCD_waitShort();
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    _lcd_enableOn();
     _delay_us(50);
-    ret |= ( xPIN(LCD_DATA_LINE) & 0x0F );
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    bit8_set( bit8_and( xPIN(LCD_DATA_LINE), 0x0F ) );
+    _lcd_enableOff();
 #else
     xDDR(LCD_DATA_LINE) = 0x00;
-    xPORT(LCD_CTRL_LINE) |= LCD_E;
+    _lcd_enableOn();
     _delay_us(50);
     ret = xPIN(LCD_DATA_LINE);
-    xPORT(LCD_CTRL_LINE) &=~LCD_E;
+    _lcd_enableOff();
 #endif // LCD_4BIT
     lcd_waitShort();
     return ret;
 }
 
 uint8_t LCD_getAddressDDRAM( void ) {
-    return lcd_getBusyAndAddressDDRAM() & ~LCD_BUSY_BIT;
+    return bit8_and( lcd_getBusyAndAddressDDRAM(), ~LCD_BUSY_BIT );
 }
 
 bool LCD_isBusy( void ) {
-    return lcd_getBusyAndAddressDDRAM() & LCD_BUSY_BIT;
+    return bit8_and( lcd_getBusyAndAddressDDRAM(), LCD_BUSY_BIT );
 }
 
 void _lcd_command( uint8_t cmd, bool useBusyFlag ) {
@@ -263,10 +266,10 @@ void lcd_setDisplay( bool displayOn, bool displayCursor, bool cursorBlink ) {
     uint8_t cmd = cursorBlink ? ( LCD_CMD_SET_DISPLAY | LCD_CMD_CURSOR_BLINK_ON )
                               :   LCD_CMD_SET_DISPLAY;
     if ( displayCursor ) {
-        cmd |= LCD_CMD_CURSOR_ON;
+        bit8_set( cmd, LCD_CMD_CURSOR_ON );
     }
     if ( displayOn ) {
-        cmd |= LCD_CMD_DISPLAY_ON;
+        bit8_set( cmd, LCD_CMD_DISPLAY_ON );
     }
     lcd_command( cmd );
 }
@@ -275,10 +278,10 @@ void lcd_setFunction( bool use8bits, bool use2lines, bool useLargeFont ) {
     uint8_t cmd = use8bits ? ( LCD_CMD_SET_FUNCTION | LCD_CMD_8_BIT )
                            :   LCD_CMD_SET_FUNCTION;
     if ( use2lines ) {
-        cmd |= LCD_CMD_2_LINES;
+        bit8_set( cmd, LCD_CMD_2_LINES );
     }
     if ( useLargeFont ) {
-        cmd |= LCD_CMD_FONT_LARGE;
+        bit8_set( cmd, LCD_CMD_FONT_LARGE );
     }
     lcd_command( cmd );
 }
@@ -287,7 +290,7 @@ void lcd_setEntryMode( bool shiftDisplay, bool increment ) {
     uint8_t cmd = shiftDisplay ? ( LCD_CMD_SET_ENTRY_MODE | LCD_CMD_SHIFT_DISPLAY )
                                :   LCD_CMD_SET_ENTRY_MODE;
     if ( increment ) {
-        cmd |= LCD_CMD_EM_INCREMENT;
+        bit8_set( cmd, LCD_CMD_EM_INCREMENT );
     }
     lcd_command( cmd );
 }
@@ -299,10 +302,10 @@ void lcd_shift( int8_t offset, bool shiftDisplay ) {
     _lcd_setCommandMode();
     uint8_t cmd = LCD_CMD_SHIFT;
     if ( shiftDisplay ) {
-        cmd |= LCD_CMD_SHIFT_DISPLAY;
+        bit8_set( cmd, LCD_CMD_SHIFT_DISPLAY );
     }
     if ( offset > 0 ) {
-        cmd |= LCD_CMD_SHIFT_RIGHT;
+        bit8_set( cmd, LCD_CMD_SHIFT_RIGHT );
     } else {
         offset = -offset;
     }

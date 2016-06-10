@@ -13,13 +13,11 @@
 #define CONCAT(x,y)   CONCAT0(x,y)
 //#define EXPAND(x)     x
 
-#define xPORT(x)  CONCAT(PORT,x)
-#define xDDR(x)   CONCAT(DDR,x)
-#define xPIN(x)   CONCAT(PIN,x)
+#define xPORT(x)      CONCAT(PORT,x)
+#define xDDR(x)       CONCAT(DDR,x)
+#define xPIN(x)       CONCAT(PIN,x)
 
-//#define _NOP()  do { __asm__ __volatile__ ("nop"); } while (0)
-#define _NOP()  STATEMENT( __asm__ __volatile__ ("nop"); )
-#define _delay_ticks(x)  for( volatile uint8_t _delayer = x; _delayer > 0; _delayer-- )
+#define ESC  "\x1B"
 
 #define BYTE2BIN_FORMAT "%c%c%c%c%c%c%c%c"
 #define BYTE2BIN_ARG(byte)   \
@@ -32,7 +30,19 @@
   (byte & 0x02 ? '1' : '0'), \
   (byte & 0x01 ? '1' : '0')
 
-#define ESC  "\x1B"
+#define bv8(x)                      ( (uint8_t)( 1<< (x) ) )
+#define bit8_and(x,y)               ( (uint8_t)( (uint8_t)(x) & (uint8_t)(y) ) )
+#define bit8_or(x,y)                ( (uint8_t)( (uint8_t)(x) | (uint8_t)(y) ) )
+#define bit8_xor(x,y)               ( (uint8_t)( (uint8_t)(x) ^ (uint8_t)(y) ) )
+#define bit8_not(x)                 ( (uint8_t)~(x) )
+#define bit8_set(x,y)               STATEMENT( (x) |= (uint8_t)(y); )
+#define bit8_clear(x,y)             STATEMENT( (x) &= bit8_not(y); )
+// note that both |= & &= on uint8_t LHS doesn't require casts by themselves!
+#define bit8_if(c,x,y)              STATEMENT( if ( c ) { bit8_set(x,y); } else { bit8_clear(x,y); } )
+#define bit8_lsb(x)                 ( (uint8_t)( x & 1 ) )
+#define BV                          bv8
+
+#define _delay_ticks(x)  for( volatile uint8_t _delayer = (x); _delayer > 0; _delayer-- )
 
 #ifdef DEBUG
 #define debug_printf(...)   printf( __VA_ARGS__ )

@@ -4,11 +4,16 @@
  *   LCD lib
  */
 
-#if !defined(LCD_DATA_LINE) || !defined(LCD_CTRL_LINE) || !defined (LCD_RS) || !defined LCD_RW || !defined LCD_E
-#error "missing one or more needed definitions: LCD_DATA_LINE, LCD_CTRL_LINE, LCD_RS, LCD_RW, LCD_E"
+#if !defined(LCD_DATA_LINE) || !defined(LCD_CTRL_LINE) \
+ || !defined(LCD_RS_PIN_NR) || !defined(LCD_RW_PIN_NR) || !defined(LCD_E_PIN_NR)
+#error "missing one or more needed definitions: LCD_DATA_LINE, LCD_CTRL_LINE, LCD_RS_PIN_NR, LCD_RW_PIN_NR, LCD_E_PIN_NR"
 #else
 
 #include "macro.h"
+
+#define LCD_E   BV(LCD_E_PIN_NR)
+#define LCD_RS  BV(LCD_RS_PIN_NR)
+#define LCD_RW  BV(LCD_RW_PIN_NR)
 
 // define LCD_RW == LCD_RS if RW is not connected;
 // code deals with it by overwriting RW address with RS values
@@ -16,48 +21,51 @@
 // NOTE: in 4bit mode, LCD receives data on high nibble;
 // this code sends it out on AVR port's low nibble instead
 
-#define LCD_CMD_CLEAR              0b00000001
+#define LCD_CMD_CLEAR              BV(0)
 
-#define LCD_CMD_HOME               0b00000010
+#define LCD_CMD_HOME               BV(1)
 
-#define LCD_CMD_SET_ENTRY_MODE     0b00000100
-#define LCD_CMD_EM_SHIFT_CURSOR    0
-#define LCD_CMD_EM_SHIFT_DISPLAY   0b00000001
+#define LCD_CMD_SET_ENTRY_MODE     BV(2)
 #define LCD_CMD_EM_DECREMENT       0
-#define LCD_CMD_EM_INCREMENT       0b00000010
+#define LCD_CMD_EM_INCREMENT       BV(1)
+#define LCD_CMD_EM_SHIFT_CURSOR    0
+#define LCD_CMD_EM_SHIFT_DISPLAY   BV(0)
 
-#define LCD_CMD_SET_DISPLAY        0b00001000
+#define LCD_CMD_SET_DISPLAY        BV(3)
 #define LCD_CMD_DISPLAY_OFF        0
-#define LCD_CMD_DISPLAY_ON         0b00000100
+#define LCD_CMD_DISPLAY_ON         BV(2)
 #define LCD_CMD_CURSOR_OFF         0
-#define LCD_CMD_CURSOR_ON          0b00000010
+#define LCD_CMD_CURSOR_ON          BV(1)
 #define LCD_CMD_CURSOR_BLINK_OFF   0
-#define LCD_CMD_CURSOR_BLINK_ON    0b00000001
+#define LCD_CMD_CURSOR_BLINK_ON    BV(0)
 
-#define LCD_CMD_SHIFT              0b00010000
+#define LCD_CMD_SHIFT              BV(4)
 #define LCD_CMD_SHIFT_CURSOR       0
-#define LCD_CMD_SHIFT_DISPLAY      0b00001000
+#define LCD_CMD_SHIFT_DISPLAY      BV(3)
 #define LCD_CMD_SHIFT_LEFT         0
-#define LCD_CMD_SHIFT_RIGHT        0b00000100
+#define LCD_CMD_SHIFT_RIGHT        BV(2)
 
-#define LCD_CMD_SET_FUNCTION TAB   0b00100000
-#define LCD_CMD_FONT_REGULAR TAB   0
-#define LCD_CMD_FONT_LARGE         0b00000100
-#define LCD_CMD_1_LINE             0
-#define LCD_CMD_2_LINES            0b00001000
+#define LCD_CMD_SET_FUNCTION TAB   BV(5)
 #define LCD_CMD_4_BIT              0
-#define LCD_CMD_8_BIT              0b00010000
+#define LCD_CMD_8_BIT              BV(4)
+#define LCD_CMD_1_LINE             0
+#define LCD_CMD_2_LINES            BV(3)
+#define LCD_CMD_FONT_REGULAR TAB   0
+#define LCD_CMD_FONT_LARGE         BV(2)
 
-#define LCD_CMD_SET_CGRAM          0b01000000
+#define LCD_CMD_SET_CGRAM          BV(6)
 
-#define LCD_CMD_SET_DDRAM          0b10000000
+#define LCD_CMD_SET_DDRAM          BV(7)
 
-#define LCD_BUSY_BIT               (1<< 7)
+#define LCD_BUSY_BIT               BV(7)
 
 #define LCD_LINE_1_OFFSET          0x00
 #define LCD_LINE_2_OFFSET          0x40
 #define LCD_LINE_3_OFFSET          0x14
 #define LCD_LINE_4_OFFSET          0x54
+
+#define _lcd_enableOn()       STATEMENT( bit8_set( xPORT(LCD_CTRL_LINE), LCD_E ); )
+#define _lcd_enableOff()      STATEMENT( bit8_clear( xPORT(LCD_CTRL_LINE), LCD_E ); )
 
 void lcd_preinit( void );
 void lcd_init4bit( void );

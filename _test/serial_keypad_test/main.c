@@ -13,7 +13,6 @@
 #define KEYPAD C /*A*/
 #include "vax/keypad.h"
 
-#define BAUD  9600
 #include "vax/uart.h"
 
 void blink_init( volatile uint8_t* where, uint8_t what ) {
@@ -45,7 +44,7 @@ int main( void ) {
 
     uint8_t keyNum = NO_KEY_PRESSED, keyNumLast = 0xFE;
 
-    while(1) {
+    for(;;) {
         keyNum = getKeyPressed();
         //printf( BYTE2BIN_FORMAT"\n\r...\n\r", BYTE2BIN_ARG(xPIN(KEYPAD)) );
         if ( keyNum != NO_KEY_PRESSED ) {

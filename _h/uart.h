@@ -3,6 +3,14 @@
 // UART code
 #include <avr/io.h>
 
+#ifndef BAUD
+#define BAUD  115200
+#endif
+
+#ifndef UBRRL_VALUE
+#include <util/setbaud.h>
+#endif
+
 void uart_init( void );
 void uart_stdio( void );
 uint8_t uart_getchar( void );

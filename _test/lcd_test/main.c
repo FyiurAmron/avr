@@ -13,15 +13,14 @@
 #define KEYPAD C /*A*/
 #include "vax/keypad.h"
 
-#define BAUD  9600
 #include "vax/uart.h"
 
 #define LCD_DATA  A /*C*/
 #define LCD_CTRL  D
 
-#define LCD_RS  (1<< 6)
-#define LCD_RW  (1<< 5)
-#define LCD_E   (1<< 4)
+#define LCD_RS  BV(6)
+#define LCD_RW  BV(5)
+#define LCD_E   BV(4)
 
 #include "vax/lcd_hd44780.h"
 

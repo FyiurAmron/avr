@@ -13,7 +13,6 @@
 #define KEYPAD C /*A*/
 #include "vax/keypad.h"
 
-#define BAUD  9600
 #include "vax/uart.h"
 
 #define LCD_DATA  A /*C*/
@@ -145,7 +144,7 @@ int main( void ) {
 #endif
     uint8_t keyNum = NO_KEY_PRESSED, keyNumLast = 0xFE;
 
-    while(1) {
+    for(;;) {
         keyNum = getKeyPressed();
 if ( keyNum != NO_KEY_PRESSED ) {
         //            LCD_writeChar( KEYCODES[keyNum] );

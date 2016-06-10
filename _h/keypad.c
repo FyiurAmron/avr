@@ -26,18 +26,18 @@ uint8_t getKeyPressed(void) {
     xPORT(KEYPAD_HIGH) = KEYPAD_HIGH_BITMASK;
 #  else
     for( int8_t c = KEYPAD_LOW_END; c >= KEYPAD_LOW_START; c-- ) {
-        xPORT(KEYPAD_LOW)  &=~(1 << c);
+        bit8_clear( xPORT(KEYPAD_LOW), bv8(c) );
     }
     for( int8_t c = KEYPAD_HIGH_END; c >= KEYPAD_HIGH_START; c-- ) {
-        xPORT(KEYPAD_HIGH) |= (1 << c);
+        bit8_set( xPORT(KEYPAD_HIGH), bv8(c) );
     }
 #  endif
 #endif // KEYPAD_DEFAULT_BITMASK
     for( int8_t c = KEYPAD_LOW_END; c >= KEYPAD_LOW_START; c-- ) {
-        xDDR(KEYPAD_LOW) = (1 << c);
+        xDDR(KEYPAD_LOW) = bv8(c);
         _delay_ticks(KEYPAD_IO_DELAY_TICKS); // needed to sync I with O
         for( int8_t r = KEYPAD_HIGH_END; r >= KEYPAD_HIGH_START; r-- ) {
-            if( ~xPIN(KEYPAD_HIGH) & (1 << r) ) {
+            if( bit8_and( ~xPIN(KEYPAD_HIGH), bv8(r) ) ) {
                 return 4 * ( r - KEYPAD_HIGH_START ) + c;
             }
         }

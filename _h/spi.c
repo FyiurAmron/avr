@@ -2,22 +2,23 @@
 #include "spi.h"
 
 void spi_preinit( void ) {
-    xDDR(SPI_SCK_LINE)  |= SPI_SCK;
-    xDDR(SPI_MISO_LINE) &=~SPI_MISO;
-    xDDR(SPI_MOSI_LINE) |= SPI_MOSI;
+    bit8_set( xDDR(SPI_SCK_LINE), SPI_SCK );
+    bit8_clear( xDDR(SPI_MISO_LINE), SPI_MISO );
+    bit8_set( xDDR(SPI_MOSI_LINE), SPI_MOSI );
 #ifdef SPI_SS_LINE
-    xDDR(SPI_SS_LINE)   |= SPI_SS;
+    bit8_set( xDDR(SPI_SS_LINE), SPI_SS );
 #endif
     //assert_SS();
 }
 
 void spi_init( uint8_t speed ) {
-    SPCR = _BV(SPE) | _BV(MSTR); // SPI Enable, Master
-    SPCR |= ( speed & 0b0011 );
-    if ( speed & 0b0100 ) {
-        SPSR |= _BV(SPI2X);
+    SPCR = BV(MSTR); // set Master
+    bit8_set( SPCR, BV(SPE) ); // SPI Enable
+    bit8_set( SPCR, bit8_and( speed, 0b0011 ) );
+    if ( bit8_and( speed, 0b0100 ) ) {
+        bit8_set( SPSR, BV(SPI2X) );
     } else {
-        SPSR &=~_BV(SPI2X);
+        bit8_clear( SPSR, BV(SPI2X) );
     }
 }
 
@@ -33,7 +34,7 @@ uint8_t spi_sync( void ) {
 
 uint8_t spi_send( uint8_t out ) {
     SPDR = out;
-    while( !(SPSR & _BV(SPIF)) ) {} // wait for SPIF flag in SPSR
+    while ( !bit8_and( SPSR, BV(SPIF) ) ) { /* wait for SPIF flag in SPSR */ }
     return SPDR;
 }
 

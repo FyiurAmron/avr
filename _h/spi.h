@@ -9,14 +9,14 @@
 #include <avr/io.h>
 #include "macro.h"
 
-#define SPI_SCK          _BV(SPI_SCK_PIN_NR)
-#define SPI_MISO         _BV(SPI_MISO_PIN_NR)
-#define SPI_MOSI         _BV(SPI_MOSI_PIN_NR)
-#define SPI_SS           _BV(SPI_SS_PIN_NR)
+#define SPI_SCK          BV(SPI_SCK_PIN_NR)
+#define SPI_MISO         BV(SPI_MISO_PIN_NR)
+#define SPI_MOSI         BV(SPI_MOSI_PIN_NR)
+#define SPI_SS           BV(SPI_SS_PIN_NR)
 
 #ifdef SPI_SS_LINE
-#define spi_assert_SS()    xPORT(SPI_SS_LINE) &=~SPI_SS
-#define spi_deassert_SS()  xPORT(SPI_SS_LINE) |= SPI_SS
+#define spi_assert_SS()    bit8_clear( xPORT(SPI_SS_LINE), SPI_SS )
+#define spi_deassert_SS()  bit8_set( xPORT(SPI_SS_LINE), SPI_SS )
 #else
 #define spi_assert_SS()    EMPTY_STATEMENT
 #define spi_deassert_SS()  EMPTY_STATEMENT

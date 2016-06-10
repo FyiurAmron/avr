@@ -6,9 +6,6 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#define BAUD  9600
-#include <util/setbaud.h>
-#undef USE_2X
 #include "vax/uart.h"
 
 int main( void ) {
@@ -17,7 +14,7 @@ int main( void ) {
     uart_init();
     uart_stdio();
 
-    while(1) {
+    for(;;) {
         //printf( "\n\rDevice started!\n\r" );
         uart_putchar( '~' );
         _delay_ms(1000);

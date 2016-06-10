@@ -19,9 +19,6 @@
 //#define KEYPAD C
 //#include "vax/keypad.h"
 
-#define BAUD  9600
-#include <util/setbaud.h>
-#undef USE_2X
 #include "vax/uart.h"
 
 #define DIST_LINE    D

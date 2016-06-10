@@ -20,19 +20,19 @@ inline void bit_setTo( volatile uint8_t* where, uint8_t what, bool value ) {
 }
 
 inline void bit_set( volatile uint8_t* where, uint8_t what ) {
-	*where |= (1<< what);
+	*where |= (uint8_t)(1<< what);
 }
 
 inline void bit_clear( volatile uint8_t* where, uint8_t what ) {
-	*where &= ~(1<< what);
+	*where &= (uint8_t)(~(uint8_t)(1<< what));
 }
 
 inline void bit_toggle( volatile uint8_t* where, uint8_t what ) {
-	*where ^= (1<< what);
+	*where ^= (uint8_t)(1<< what);
 }
 
 inline bool bit_is( volatile uint8_t* where, uint8_t what ) {
-	return *where & (1<< what);
+	return *where & (uint8_t)(1<< what);
 }
 
 #ifdef BITS_SHORT_NAMES
