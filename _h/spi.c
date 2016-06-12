@@ -22,21 +22,19 @@ void spi_init( uint8_t speed ) {
     }
 }
 
-/*
-uint8_t spi_sync( void ) {
-    spi_assert_SS();
-    for( uint8_t i = 10; i > 0; i-- ) { // idle for 10 bytes / 80 clocks
-        spi_send( SPI_EMPTY_BYTE );
-    }
-    spi_deassert_SS();
-}
-*/
-
 uint8_t spi_send( uint8_t out ) {
     SPDR = out;
     while ( !bit8_and( SPSR, BV(SPIF) ) ) { /* wait for SPIF flag in SPSR */ }
     return SPDR;
 }
+
+#ifndef SPI_RECV_MACRO
+uint8_t spi_recv( void ) {
+    SPDR = 0xFF;
+    while ( !bit8_and( SPSR, BV(SPIF) ) ) { /* wait for SPIF flag in SPSR */ }
+    return SPDR;
+}
+#endif
 
 #ifdef SPI_STREAMS
 FILE _spi_input  = FDEV_SETUP_STREAM( NULL, _spi_getchar_FDEV, _FDEV_SETUP_READ  );
@@ -51,7 +49,7 @@ void spi_stdio( void ) {
 
 int _uart_getchar_FDEV( FILE *stream ) {
     do {
-    uint8_t ret = spi_send( SPI_EMPTY_BYTE );
+        uint8_t ret = spi_recv();
     } while( ret == SPI_EMPTY_BYTE );
     return ret;
 }

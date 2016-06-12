@@ -40,10 +40,10 @@ int main( void ) {
     //printf( "\x7F""‹""\x7F""‹‹\n\r" );
     //printf( "%d\n\r", sizeof((uint32_t)(a)<<8 );
 /*
-    ASM_ADD(d,d,d);
-    ASM_ADC(c,c,c);
-    ASM_ADC(b,b,b);
-    ASM_ADC(a,a,a);
+    ASM_ADD(d,d);
+    ASM_ADC(c,c);
+    ASM_ADC(b,b);
+    ASM_ADC(a,a);
 
     printf( "0x%lX\n\r", ((((((uint32_t)(a)<<8)|b)<<8)|c)<<8)|d );
 */

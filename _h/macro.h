@@ -4,11 +4,11 @@
 #include <stdbool.h>
 
 #define NOTHING
-#define STATEMENT(x)  do { x } while(0)
+#define STATEMENT(...)  do { __VA_ARGS__ } while(0)
 #define EMPTY_STATEMENT  STATEMENT(NOTHING)
 
-#define QUOTE0(x)     #x
-#define QUOTE(x)      QUOTE0(x)
+#define QUOTE0(...)     #__VA_ARGS__
+#define QUOTE(...)      QUOTE0(__VA_ARGS__)
 #define CONCAT0(x,y)  x ## y
 #define CONCAT(x,y)   CONCAT0(x,y)
 //#define EXPAND(x)     x

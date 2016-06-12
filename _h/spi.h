@@ -36,6 +36,11 @@
 void spi_preinit( void );
 void spi_init( uint8_t speed );
 uint8_t spi_send( uint8_t out );
+#ifdef SPI_RECV_MACRO
+#define spi_recv()  spi_send( SPI_EMPTY_BYTE )
+#else
+uint8_t spi_recv( void );
+#endif
 
 #ifdef COMPILE_SINGLE_FILE
 #include "spi.c"

@@ -101,7 +101,7 @@ ASRC =
 #     0 = turn off optimization. s = optimize for size.
 #     (Note: 3 is not always the best optimization level. See avr-libc FAQ.)
 #OPT = 3
-OPT = 3
+OPT = s
 
 
 # Debugging format.

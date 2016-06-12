@@ -1,91 +1,6 @@
 //
 #include "main.h"
 
-// sd.c /.h
-
-// @return  response returned from command, or SPI_EMPTY_BYTE (0xFF) if failed
-// note 1: this code assumes a regular 512-byte block since SDHC allows only this
-// note 2: this function is somewhat slower than sd_readSingleBlockHC
-uint8_t sd_readPartialBlockHC( uint8_t addr3, uint8_t addr2, uint8_t addr1, uint8_t addr0, uint8_t* buf, uint16_t offset, uint16_t len ) {
-    uint8_t ret = sd_command( SD_READ_SINGLE_BLOCK, addr3, addr2, addr1, addr0 );
-    if ( ret != SD_RET_READY ) {
-        sd_debug_printf( "RET: not READY; [0x%02hhx] received\n\r", ret );
-        return SPI_EMPTY_BYTE;
-    }
-    spi_assert_SS();
-    for( uint8_t i = SD_SPI_RESPONSE_WAIT_MAX; i > 0; i-- ) {
-        buf[0] = spi_send( SPI_EMPTY_BYTE );
-        if ( buf[0] == SPI_EMPTY_BYTE  ) {
-            continue;
-        }
-        if ( buf[0] != SD_DATA_TOKEN ) {
-            spi_deassert_SS();
-            sd_debug_printf( "RET: invalid token received\n\r" );
-            return SPI_EMPTY_BYTE;
-        }
-        uint16_t i = 0, end = offset + len;
-        for( ; i < offset; i++ ) {
-            spi_send( SPI_EMPTY_BYTE );
-        }
-        for( ; i < end; i++ ) {
-            *(buf++) = spi_send( SPI_EMPTY_BYTE );
-        }
-        for( ; i < SD_HC_BLOCK_LENGTH; i++ ) {
-                spi_send( SPI_EMPTY_BYTE );
-        }
-        uint8_t crc1 = spi_send( SPI_EMPTY_BYTE );
-        uint8_t crc2 = spi_send( SPI_EMPTY_BYTE );
-        sd_debug_printf( "CRC: 0x%02hhx %02hhx\n\r", crc1, crc2 );
-        spi_send( SPI_EMPTY_BYTE ); // required 8 clock cooldown
-        return ret;
-    }
-    spi_deassert_SS();
-    sd_debug_printf( "RET: busy\n\r" );
-    return SPI_EMPTY_BYTE;
-}
-
-// @return  response returned from command, or SPI_EMPTY_BYTE (0xFF) if failed
-// note: this code assumes a regular 512-byte block since SDHC allows only this
-// pass len == 0 to read all 512 bytes into buf
-uint8_t sd_readSingleBlockHC( uint8_t addr3, uint8_t addr2, uint8_t addr1, uint8_t addr0, uint8_t* buf ) {
-    uint8_t ret = sd_command( SD_READ_SINGLE_BLOCK, addr3, addr2, addr1, addr0 );
-    if ( ret != SD_RET_READY ) {
-        sd_debug_printf( "RET: not READY; [0x%02hhx] received\n\r", ret );
-        return SPI_EMPTY_BYTE;
-    }
-    spi_assert_SS();
-    for( uint8_t i = SD_SPI_RESPONSE_WAIT_MAX; i > 0; i-- ) {
-        buf[0] = spi_send( SPI_EMPTY_BYTE );
-        if ( buf[0] == SPI_EMPTY_BYTE  ) {
-            continue;
-        }
-        if ( buf[0] != SD_DATA_TOKEN ) {
-            spi_deassert_SS();
-            sd_debug_printf( "RET: invalid token received\n\r" );
-            return SPI_EMPTY_BYTE;
-        }
-        for( uint8_t i = 0; i != 255; i++ ) {
-            buf[i] = spi_send( SPI_EMPTY_BYTE );
-        }
-        buf += 255;
-        for( uint8_t i = 0; i != 255; i++ ) {
-            buf[i] = spi_send( SPI_EMPTY_BYTE );
-        }
-        buf += 255;
-        buf[0] = spi_send( SPI_EMPTY_BYTE );
-        buf[1] = spi_send( SPI_EMPTY_BYTE );
-
-        uint8_t crc1 = spi_send( SPI_EMPTY_BYTE );
-        uint8_t crc2 = spi_send( SPI_EMPTY_BYTE );
-        sd_debug_printf( "CRC: 0x%02hhx %02hhx\n\r", crc1, crc2 );
-        spi_send( SPI_EMPTY_BYTE ); // required 8 clock cooldown
-        return ret;
-    }
-    spi_deassert_SS();
-    sd_debug_printf( "RET: busy\n\r" );
-    return SPI_EMPTY_BYTE;
-}
-
 int main( void ) {
     init();
     //while(1) {} // to quickly disable uC code
@@ -102,7 +17,7 @@ int main( void ) {
         getchar();
         printf( "* SPI: " );
         spi_preinit();
-        spi_init( SPI_FREQ_DIV2 );
+        spi_init( SPI_FREQ_DIV64 ); // for 20 MHz CPU
         printf( "OK\n\r" );
 
         printf( "* SD: " );

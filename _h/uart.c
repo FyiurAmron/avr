@@ -31,10 +31,12 @@ void uart_init( void ) {
     UBRR0H = UBRRH_VALUE;
     UBRR0L = UBRRL_VALUE;
 
-#ifdef USE_2X
+#if USE_2X == 1
     bit8_set( UCSR0A, BV(U2X0) );
-#else
+#elif USE_2X == 0
     bit8_clear( UCSR0A, BV(U2X0) );
+#else
+#error "Unknown USE_2X value"
 #endif
 
     // default settings: async, 8-N-1 ; override by setting UCSR0C/UCSR0B

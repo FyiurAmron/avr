@@ -1,4 +1,4 @@
-#define F_CPU  8000000UL
+#define F_CPU  20000000UL
 //#define F_CPU 1000000UL
 #define COMPILE_SINGLE_FILE
 #include "vax/misc.h"
@@ -13,9 +13,9 @@ int main( void ) {
 
     uart_init();
     uart_stdio();
+    printf( "\n\rDevice started: %ld %ld %d\n\r", UBRRH_VALUE, UBRRL_VALUE, USE_2X );
 
     for(;;) {
-        //printf( "\n\rDevice started!\n\r" );
         uart_putchar( '~' );
         _delay_ms(1000);
     }

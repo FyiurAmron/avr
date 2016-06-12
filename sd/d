@@ -1,0 +1,53 @@
+Comparing files l1.txt and L2.TXT
+***** l1.txt
+loop2a:
+        push r14
+***** L2.TXT
+loop2b:
+        push r14
+*****
+
+***** l1.txt
+        dec r14
+.L10:
+        ldi r24,lo8(-1)
+***** L2.TXT
+        dec r14
+.L15:
+        ldi r24,lo8(-1)
+*****
+
+***** l1.txt
+        dec r14
+        brne .L10
+        ldi r24,lo8(255)
+        mov r14,r24
+        mov r15,__zero_reg__
+***** L2.TXT
+        dec r14
+        brne .L15
+        ldi r25,lo8(255)
+        mov r14,r25
+        mov r15,__zero_reg__
+*****
+
+***** l1.txt
+        sbci r17,hi8(-(510))
+.L11:
+        ldi r24,lo8(-1)
+***** L2.TXT
+        sbci r17,hi8(-(510))
+.L16:
+        ldi r24,lo8(-1)
+*****
+
+***** l1.txt
+        cpc r29,r17
+        brne .L11
+        mov r28,r14
+***** L2.TXT
+        cpc r29,r17
+        brne .L16
+        mov r28,r14
+*****
+

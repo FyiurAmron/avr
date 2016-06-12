@@ -18,9 +18,6 @@
 
 #include "vax/misc.h"
 
-#define BAUD  115200
-#include <util/setbaud.h>
-//#undef USE_2X
 #include "vax/uart.h"
 
 #define SPI_SCK_LINE     B
@@ -34,9 +31,10 @@
 
 #define SD_DEBUG
 //#define SD_DEBUG_VERBOSE
-//#define SD_DONT_UNROLL_RECV_BLOCK
+#define SD_INIT_IDLE_CYCLES       250
 #define SD_SPI_RESPONSE_WAIT_MAX  250 // TODO check actual limits on this!
 #define SD_INIT_STEP_DELAY        100
+//#define SD_DONT_UNROLL_RECV_BLOCK
 #include "vax/sd.h"
 
 #include "vax/fat.h"

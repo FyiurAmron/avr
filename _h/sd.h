@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "spi.h"
+#include "asm.h"
 
 #define SD_HC_BLOCK_LENGTH  512
 
@@ -23,6 +24,12 @@
 #define sd_debug_printf(...)  printf(__VA_ARGS__)
 #else
 #define sd_debug_printf(...)  EMPTY_STATEMENT
+#endif
+
+#ifdef SD_DEBUG_VERBOSE
+#define sd_debug_verbose_printf(...)  printf(__VA_ARGS__)
+#else
+#define sd_debug_verbose_printf(...)  EMPTY_STATEMENT
 #endif
 
 #ifndef SD_INIT_RETRIES_MAX
@@ -197,10 +204,13 @@
 ///69 00 00 00 00 E5 (ACMD 41, no HCS)
 // 69 40 00 00 00 77 (ACMD 41, HCS)
 
+void sd_preinit( void );
+uint8_t sd_commandEx( uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2, uint8_t arg3, uint8_t crc, uint8_t* retBuf );
 uint8_t sd_initEx( uint8_t* retBuf, bool useHcs );
 uint8_t _sd_legacy_cmd1_init( uint8_t* retBuf );
-uint8_t sd_commandEx( uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2, uint8_t arg3, uint8_t crc, uint8_t* retBuf );
-void sd_preinit( void );
+void _spi_recv_block( uint8_t* buf ); // internal
+uint8_t sd_readSingleBlockHC( uint8_t addr3, uint8_t addr2, uint8_t addr1, uint8_t addr0, uint8_t* buf );
+uint8_t sd_readPartialBlockHC( uint8_t addr3, uint8_t addr2, uint8_t addr1, uint8_t addr0, uint8_t* buf, uint16_t offset, uint16_t len );
 
 #ifndef SD_NO_DEFAULT_BUFFER
 uint8_t sd_command( uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2, uint8_t arg3 );
