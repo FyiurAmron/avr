@@ -1,5 +1,6 @@
 //#define F_CPU  1000000UL
 //#define F_CPU  8000000UL
+#define COMPILE_SINGLE_FILE
 #include "vax/cpu.h"
 
 #include <stdio.h>
@@ -8,8 +9,8 @@
 #include <avr/power.h>
 //#include <avr/cpufunc.h>
 
-#define BAUD  9600
-#include <util/setbaud.h>
+//#define BAUD  9600
+//#include <util/setbaud.h>
 //#undef USE2X
 // FIXME UART errors?
 #include "vax/uart.h"
@@ -19,9 +20,9 @@
 #define LCD_DATA_LINE  A /*C*/
 #define LCD_CTRL_LINE  D
 
-#define LCD_RS  (1<< 6)
-#define LCD_RW  (1<< 5)
-#define LCD_E   (1<< 4)
+#define LCD_RS_PIN_NR  6
+#define LCD_RW_PIN_NR  5
+#define LCD_E_PIN_NR   4
 
 #define LCD_4BIT
 #include "vax/lcd_hd44780.h"
@@ -96,27 +97,27 @@ int main( void ) {
     //etc.
 
     uart_init();
-    uart_as_stdio();
+    uart_stdio();
 
     // LCD control
-    LCD_preinit();
+    lcd_preinit();
     _delay_ms(50);
-    LCD_init4bit();
+    lcd_init4bit();
     //LCD_setFunction( LCD_CMD_8_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
-    LCD_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );    
-    LCD_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
-    LCD_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
-    LCD_setEntryMode( LCD_CMD_EM_SHIFT_CURSOR, LCD_CMD_EM_INCREMENT );
-    LCD_clear();
+    lcd_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );    
+    lcd_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
+    lcd_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
+    lcd_setEntryMode( LCD_CMD_EM_SHIFT_CURSOR, LCD_CMD_EM_INCREMENT );
+    lcd_clear();
 
     puts("\n\rDevice started...\r");
 
     for( uint8_t i = 0; i < 8; i++ ) {
-        LCD_putchar( i );
+        lcd_putchar( i );
     }
-    LCD_gotoLine2();
+    lcd_gotoLine2();
     for( uint8_t i = 0; i < 8; i++ ) {
-        LCD_putchar( i );
+        lcd_putchar( i );
     }
 
     const uint8_t * charPtr   = charFishX2;
@@ -124,13 +125,13 @@ int main( void ) {
 
     while(1) {
         for( uint8_t i = 0; i < 8; i++ ) {
-            LCD_setCharacter( i, charPtr++ );
+            lcd_setCharacter( i, charPtr++ );
             if ( charPtr >= charLimit ) {
                 charPtr -= 8;
             }
         }
         charPtr++;
-        //uart_putchar('*');
+        uart_putchar('*');
         //while ( getKeyPressed() == NO_KEY_PRESSED ) {}
         _delay_ms(50);
     }

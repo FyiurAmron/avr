@@ -31,7 +31,7 @@
 
 #define SD_DEBUG
 //#define SD_DEBUG_VERBOSE
-#define SD_INIT_IDLE_CYCLES       250
+//#define SD_INIT_IDLE_CYCLES       250
 #define SD_SPI_RESPONSE_WAIT_MAX  250 // TODO check actual limits on this!
 #define SD_INIT_STEP_DELAY        100
 //#define SD_DONT_UNROLL_RECV_BLOCK

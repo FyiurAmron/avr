@@ -6,12 +6,11 @@ volatile uint16_t pos = 0;
 volatile uint8_t *pwmBlockCur, *pwmBlockNext;
 volatile bool pwmNeedUpdate = false;
 #define SIZE  512
-volatile uint8_t block1[SIZE], block2[SIZE];
 
 ISR( TIMER0_OVF_vect ) { // overflow, 1/256 clocks i.e. for 20 MHz CPU f_OVF = 78125 Hz
     tick++;
     if ( tick != 2 ) {
-        continue;
+        return;
     }
     tick = 0;
     OCR1A = pwmBlockCur[pos];
@@ -24,16 +23,27 @@ ISR( TIMER0_OVF_vect ) { // overflow, 1/256 clocks i.e. for 20 MHz CPU f_OVF = 7
     }
 }
 
-void pwm_init(void) {
-  DDRD = _BV(PD5); // set OC1A pin as output
+void pwm_init( void ) {
+  bit8_set( DDRD, BV(PD5) ); // set OC1A pin as output
 
-  TCCR1A = _BV(COM1A1) | _BV(WGM10);
-  TCCR1B = _BV(WGM12) | _BV(CS10);
+  bit8_set( TCCR1A, BV(COM1A1) | BV(WGM10) );
+  bit8_set( TCCR1B, BV(WGM12) | BV(CS10) );
    
-  TCCR0B |= _BV(CS00);  // enable timer 0
-  TIMSK0 |= _BV(TOIE0); // enable timer 0 interrupt
+  bit8_set( TCCR0B, BV(CS00) );  // enable timer 0
+  bit8_set( TIMSK0, BV(TOIE0) ); // enable timer 0 interrupt
   
   OCR1A = 0x80;
+}
+
+void pwm_disable( void ) {
+    cli();
+
+    OCR1A = 0x80;
+
+    TCCR0A = 0;
+    TCCR0B = 0;
+    TCCR1A = 0;
+    TCCR1B = 0;
 }
 
 int main( void ) {
@@ -47,11 +57,24 @@ int main( void ) {
     printf( "\n\r*** Device initializing:\n\r" );
     printf( "\n\r" );
     printf( "* UART: OK\n\r" );
-printf( "* PWM: OK\n\r" );
+    //printf( "* PWM: OK\n\r" );
+
+    bit8_set( xPORT(B), BV(PB0) );
+
+    uint8_t block1[SIZE] = {0}, block2[SIZE] = {0};
     for(;;) {
-        printf( "press any key to continue...\n\r" );
-        getchar();
-        printf( "* SPI: " );
+      init:
+        //printf( "press any key to continue... " );
+        //getchar();
+        //_delay_ms(100);
+        while( !bit8_and( xPIN(B), BV(PB0) ) ) {}
+        printf( "press START (PB0) to continue" );
+        while( bit8_and( xPIN(B), BV(PB0) ) ) {
+            putchar( '.' );
+            _delay_ms(500);
+        }
+        _delay_ms(10);
+        printf( "\n\r* SPI: " );
         spi_preinit();
         spi_init( SPI_FREQ_DIV128 );
         printf( "OK\n\r" );
@@ -59,19 +82,21 @@ printf( "* PWM: OK\n\r" );
         printf( "* SD: " );
         sd_preinit();
         uint8_t sd_init_ret = sd_init();
-        printf( sd_init_ret == SD_INIT_NO_ERROR ? "OK" : "failed");
+        printf( sd_init_ret == SD_INIT_NO_ERROR ? "OK" : "failed" );
         printf( " [%hhu] \n\r\n\r", sd_init_ret );
 
         // MBR is @ addr 0
         sd_readPartialBlockHC( 0, 0, 0, 0,
             block1, MBR_SIZE - MBR_EEM_SIZE - 4 * MBR_PE_SIZE, MBR_PE_SIZE );
+/*
         sd_readPartialBlockHC( 0, 0, 0, 0,
             block1 + MBR_PE_SIZE, MBR_SIZE - MBR_EEM_SIZE, MBR_EEM_SIZE );
+*/
         //debug_hexDump( block1, 512 ); // dump MBR
         fs_PartitionEntry* pe = (fs_PartitionEntry*) block1;
-        fs_BootSectorEnd* eem = (fs_BootSectorEnd*) (block1 + MBR_PE_SIZE);
-        printf( "Type code: 0x%02hhx\n\r", pe->typeCode );
-        printf( "End marker: 0x%02hhx %02hhx\n\r", eem->byte1, eem->byte2 );
+        //fs_BootSectorEnd* eem = (fs_BootSectorEnd*) (block1 + MBR_PE_SIZE);
+        //printf( "Type code: 0x%02hhx\n\r", pe->typeCode );
+        //printf( "End marker: 0x%02hhx %02hhx\n\r", eem->byte1, eem->byte2 );
         printf( "FAT Boot Sector:\n\r" );
         uint32_t baseAddr = UINT8x4_TO_UINT32( pe->lbaStart0, pe->lbaStart1, pe->lbaStart2, pe->lbaStart3 );
         sd_readSingleBlockHC( pe->lbaStart0, pe->lbaStart1, pe->lbaStart2, pe->lbaStart3, block1 );
@@ -85,10 +110,10 @@ printf( "* PWM: OK\n\r" );
         uint32_t addr = baseAddr;
         // addr == root dir ATM
         for( uint8_t sec = secPerClust; sec > 0; sec--, addr++ ) {
-            uint8_t rootBlock[512];
-            sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr), rootBlock );
+            //uint8_t rootBlock[512];
+            sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr), block2 );
             //debug_hexDump( rootBlock, 512 ); // dump root dir
-            fat_FileEntry* fe = (fat_FileEntry*) rootBlock;
+            fat_FileEntry* fe = (fat_FileEntry*) block2;
             uint32_t addr2;
             for( uint8_t i = SD_HC_BLOCK_LENGTH / sizeof(fat_FileEntry); i > 0; i--, fe++ ) {
                 if ( fe->name[0] == 0x00 ) {
@@ -110,32 +135,44 @@ printf( "* PWM: OK\n\r" );
                 if ( block1[0] != 'R' || block1[1] != 'I' || block1[2] != 'F' || block1[3] != 'F' ) {
                     continue;
                 }
-                debug_hexDump( block1, 512 );
+                //debug_hexDump( block1, 512 );
 
                 spi_init( SPI_FREQ_DIV2 );
                 for(;;) {
                     uint32_t addr3 = addr2;
                     addr3++;
-                    sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr3), block1 );
-                    addr3++;
                     sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr3), block2 );
                     pwmBlockCur = block1;
                     pwmBlockNext = block2;
+                    pos = 0x2C; // skip entire header
                     pwm_init();
                     sei();
-                    //block1 += 0x2C; // skip entire header
-                    // NOT: start async play from block1
-                    // INSTEAD: skip entire block1 (assume it's silent)
-                   for( uint16_t sec2 = (13 * secPerClust - 1) / 2; sec2 > 0; sec2-- ) {
-                        while ( !pwmNeedUpdate ) {}
+                    for( uint16_t sec2 = (13 * secPerClust - 1) / 2; sec2 > 0; sec2-- ) {
+                        while ( !pwmNeedUpdate ) {
+                            if ( !bit8_and( xPIN(B), BV(PB0) ) ) {
+                                //_delay_ms(1000);
+                                goto restart;
+                            }
+                        }
                         addr3++;
-                        sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr3), block1 );
-                        pwmBlockNext = block1;
+                        pwmBlockNext = block1; // note: ptr swap done *before* read to reduce delay
+                        if ( sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr3), block1 ) == SD_COMMAND_ERROR ) {
+                            goto restart;
+                        }
+                        //pwmBlockNext = block1;
                         pwmNeedUpdate = false;
-                        while ( !pwmNeedUpdate ) {}
+                        while ( !pwmNeedUpdate ) {
+                            if ( !bit8_and( xPIN(B), BV(PB0) ) ) {
+                                //_delay_ms(1000);
+                                goto restart;
+                            }
+                        }
                         addr3++;
-                        sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr3), block2 );
-                        pwmBlockNext = block2;
+                        pwmBlockNext = block2; // note: ptr swap done *before* read to reduce delay
+                        if ( sd_readSingleBlockHC( UINT32_TO_UINT8x4(addr3), block2 ) == SD_COMMAND_ERROR ) {
+                            goto restart;
+                        }
+                        //pwmBlockNext = block2;
                         pwmNeedUpdate = false;
                     }
                 }
@@ -143,16 +180,18 @@ printf( "* PWM: OK\n\r" );
                 printf(" : PWM ended.\n\r");
             }
         }
-        uint8_t arg0, arg1, arg2, arg3;
       endDirScan:
 	    while(1) {
 /*
+            uint8_t arg0, arg1, arg2, arg3;
 	        scanf( "%hhx %hhx %hhx %hhx", &arg0, &arg1, &arg2, &arg3 );
             printf( "\n\r" );
             sd_readSingleBlockHC( arg0, arg1, arg2, arg3, block1 );
             debug_hexDump( block1, 512 );
 */
 	    }	
-        
+      restart:
+        pwm_disable();
+        goto init;
     } // while(1)
 } // main()

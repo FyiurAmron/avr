@@ -15,6 +15,7 @@
 #include <util/delay.h>
 
 #include "vax/misc.h"
+#include "vax/macro.h"
 
 //#define KEYPAD C
 //#include "../_h/keypad.h"
@@ -35,8 +36,8 @@
 #define LCD_4BIT
 #define LCD_PUTCHAR_RAW
 #define LCD_PUTCHAR_SAFE
-#include "../_h/lcd_hd44780.h"
-#include "../_h/lcd_hd44780_ex.h"
+#include "vax/lcd_hd44780.h"
+#include "vax/lcd_hd44780_ex.h"
 
 #define KBD_DATA_LINE    D
 #define KBD_CLK_LINE     D
@@ -44,10 +45,10 @@
 #define KBD_CLK_PIN_NR   2
 
 #define KBD_USE_INT
-#include "../_h/kbd_at.h"
-#include "../_h/kbd_at_set2ex.h"
+#include "vax/kbd_at.h"
+#include "vax/kbd_at_set2ex.h"
 
-#include "../_h/mux_output.h"
+#include "vax/mux_output.h"
 
 #ifdef LIS
 #include "../_miniapp/lis/lis.h"

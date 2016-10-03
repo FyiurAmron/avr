@@ -78,8 +78,8 @@ void kbd_disableInt( void ) {
 }
 
 void kbd_init( void ) {
-    _kbd_init_ports();
-    kbd_init_int();
+    _kbd_initPorts();
+    kbd_initInt();
 }
 
 bool kbd_reset( void ) {

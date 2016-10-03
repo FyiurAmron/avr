@@ -68,6 +68,8 @@
 
 #define SD_INIT_NO_ERROR       0xFF
 
+#define SD_COMMAND_ERROR       0xFF
+
 //// SD CMD
 #define SD_CMD0                0
 #define SD_GO_IDLE_STATE       SD_CMD0

@@ -69,26 +69,26 @@ void lisuj( bool* condition ) {
     uint8_t frame = 0;
     uint8_t lcdSubPos = 0;
 
-    LCD_setDisplay( LCD_CMD_DISPLAY_OFF, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
-    LCD_setPosEx( 0 );
+    lcd_setDisplay( LCD_CMD_DISPLAY_OFF, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
+    lcd_setPosEx( 0 );
     for( uint8_t i = 0; i < FRAME_WIDTH; i++ ) {
         LCD_putcharEx( i );
     }
 
     *condition = true;
     while( *condition ) {
-        LCD_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
+        lcd_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
         _delay_ms( 50 );
-        LCD_setDisplay( LCD_CMD_DISPLAY_OFF, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
+        lcd_setDisplay( LCD_CMD_DISPLAY_OFF, LCD_CMD_CURSOR_OFF, LCD_CMD_CURSOR_BLINK_OFF );
         rotateChars4( foxChars + FRAME_LEN * frame );
         for( uint8_t i = 0; i < 4; i++ ) {
             LCD_setCharacter( i, charOut4[i] );
         }
 
-        LCD_setPosEx( lcdSubPos );
-        LCD_putcharEx( ' ' );
+        lcd_setPosEx( lcdSubPos );
+        lcd_putcharEx( ' ' );
         for( uint8_t i = 0; i < FRAME_WIDTH; i++ ) {
-            LCD_putcharEx( i );
+            lcd_putcharEx( i );
         }
         //printf("frame: %d\n\r", frame % frameCnt );
 
@@ -103,6 +103,6 @@ void lisuj( bool* condition ) {
             lcdSubPos++;
         }
     }
-    LCD_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_ON, LCD_CMD_CURSOR_BLINK_ON );
-    LCD_clear();
+    lcd_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_ON, LCD_CMD_CURSOR_BLINK_ON );
+    lcd_clear();
 }

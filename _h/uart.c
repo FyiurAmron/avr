@@ -1,5 +1,6 @@
 //
 #include "uart.h"
+#include "macro.h"
 
 #ifndef UART_NO_STREAMS
 FILE _uart_input  = FDEV_SETUP_STREAM( NULL, _uart_getchar_FDEV, _FDEV_SETUP_READ  );

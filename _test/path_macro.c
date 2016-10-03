@@ -1,7 +1,7 @@
 #define COMPILE_SINGLE_FILE
 //#define DEBUG
 
-#include <stdio.h>
+//#include <stdio.h>
 #define QUOTE0(x)     #x
 #define QUOTE(x)      QUOTE0(x)
 #define CONCAT0(x,y)  x ## y

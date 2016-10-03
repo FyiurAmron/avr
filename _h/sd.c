@@ -4,10 +4,10 @@
 void sd_preinit( void ) {
     spi_assert_SS();
 	for( uint8_t i = SD_INIT_IDLE_CYCLES; i > 0; i-- ) {
-        sd_debug_printf( "~" );
+        sd_debug_verbose_printf( "~" );
 		spi_recv();
     }
-    sd_debug_printf( "|\n\r" );
+    sd_debug_verbose_printf( "|\n\r" );
     spi_deassert_SS();
 }
 
@@ -54,7 +54,7 @@ uint8_t sd_commandEx( uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2, uin
             if ( !retBuf[1] ) { // busy; don't wait, just return; caller should wait himself
                 spi_deassert_SS();
                 sd_debug_printf( "RET: busy\n\r" );
-                return SPI_EMPTY_BYTE;
+                return SD_COMMAND_ERROR; // == SPI_EMPTY_BYTE
             } // else !busy - we already did the wait
         } else {
             for( uint8_t j = 1; j < r; j++ ) {
@@ -73,7 +73,7 @@ uint8_t sd_commandEx( uint8_t cmd, uint8_t arg0, uint8_t arg1, uint8_t arg2, uin
     }
     spi_deassert_SS();
     sd_debug_printf( "RET: error: response timeout\n\r" );
-    return SPI_EMPTY_BYTE;
+    return SD_COMMAND_ERROR; // == SPI_EMPTY_BYTE
 }
 
 uint8_t _sd_legacy_cmd1_init( uint8_t* retBuf ) {
@@ -179,9 +179,15 @@ uint8_t sd_readSingleBlockHC( uint8_t addr3, uint8_t addr2, uint8_t addr1, uint8
             return SPI_EMPTY_BYTE;
         }
         _spi_recv_block( buf );
-        // CRC values are ignored outside of debug mode
+        // CRC values are ignored outside of debug mode; split to avoid comp. warnings
+#ifdef SD_DEBUG_VERBOSE
         uint8_t crc1 = spi_recv();
         uint8_t crc2 = spi_recv();
+        sd_debug_verbose_printf( "CRC: 0x%02hhx %02hhx\n\r", crc1, crc2 );
+#else
+        spi_recv();
+        spi_recv();
+#endif
         sd_debug_verbose_printf( "CRC: 0x%02hhx %02hhx\n\r", crc1, crc2 );
         // do a CRC check if you're masochistic (or have a GHz-ish CPU)
         spi_recv(); // required 8 clock cooldown
@@ -254,9 +260,15 @@ uint8_t sd_readPartialBlockHC( uint8_t addr3, uint8_t addr2, uint8_t addr1, uint
         for( ; i < SD_HC_BLOCK_LENGTH; i++ ) {
             spi_recv();
         }
+        // CRC values are ignored outside of debug mode; split to avoid comp. warnings
+#ifdef SD_DEBUG_VERBOSE
         uint8_t crc1 = spi_recv();
         uint8_t crc2 = spi_recv();
         sd_debug_verbose_printf( "CRC: 0x%02hhx %02hhx\n\r", crc1, crc2 );
+#else
+        spi_recv();
+        spi_recv();
+#endif
         spi_recv(); // required 8 clock cooldown
         return ret;
     }

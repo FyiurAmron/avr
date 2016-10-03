@@ -13,7 +13,7 @@ int main( void ) {
     uart_printf( "* UART: OK\n\r" );
 
     while(1) {
-        uint16_t dist = dist_pingHQ();
+        uint8_t dist = dist_ping();
         switch( dist ) {
             case DIST_SENSE_OUT_OF_RANGE:
                 printf( "\n\r dist out of range\n\r" );

@@ -1,3 +1,4 @@
+#define COMPILE_SINGLE_FILE
 #define F_CPU  1000000UL
 //#define F_CPU 8000000UL
 
@@ -15,12 +16,12 @@
 
 #include "vax/uart.h"
 
-#define LCD_DATA  A /*C*/
-#define LCD_CTRL  D
+#define LCD_DATA_LINE  A /*C*/
+#define LCD_CTRL_LINE  D
 
-#define LCD_RS  BV(6)
-#define LCD_RW  BV(5)
-#define LCD_E   BV(4)
+#define LCD_RS_PIN_NR  6
+#define LCD_RW_PIN_NR  5
+#define LCD_E_PIN_NR   4
 
 #include "vax/lcd_hd44780.h"
 
@@ -30,9 +31,10 @@ int main( void ) {
     //etc.
     //while(1) {} // to quickly disable uC code
 
-    LCD_init();
+    lcd_preinit();
+    lcd_init4bit();
     uart_init();
-    uart_as_stdio();
+    uart_stdio();
 
     puts("\n\rDevice started...\r");
 
@@ -40,10 +42,10 @@ int main( void ) {
     _delay_ms(50);
     //LCD_initalize();
     //LCD_Initalize();
-    LCD_print( "test1" );
+    lcd_print( "test1" );
     //LCD_print("test1");
     //printf( "%x ", LCD_ReadStatus() );
-    printf( "%x ", LCD_getAddressDDRAM() );
+    printf( "%x ", lcd_getAddressDDRAM() );
 
 /*
 #define CODE  0

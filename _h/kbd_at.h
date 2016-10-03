@@ -10,8 +10,8 @@
 
 #define KBD_CLK       BV(KBD_CLK_PIN_NR)
 #define KBD_DATA      BV(KBD_DATA_PIN_NR)
-#define KBD_CLK_PIN   bit8_and( KBD_CLK_LINE, KBD_CLK )
-#define KBD_DATA_PIN  bit8_and( KBD_DATA_LINE, KBD_DATA )
+#define KBD_CLK_PIN   bit8_and( xPIN(KBD_CLK_LINE), KBD_CLK )
+#define KBD_DATA_PIN  bit8_and( xPIN(KBD_DATA_LINE), KBD_DATA )
 #define KBD_DATA_BIT  ( KBD_DATA_PIN >> KBD_DATA_PIN_NR )
 
 #define KBD_LED_SCROLL_LOCK  BV(0)

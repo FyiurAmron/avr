@@ -2,22 +2,22 @@
 
 #include "main.h"
 
-void LCD_setDefaults( void ) {
-    LCD_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
-    LCD_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_ON, LCD_CMD_CURSOR_BLINK_ON );
-    LCD_setEntryMode( LCD_CMD_EM_SHIFT_CURSOR, LCD_CMD_EM_INCREMENT );
-    LCD_clearEx();
+void lcd_setDefaults( void ) {
+    lcd_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );
+    lcd_setDisplay( LCD_CMD_DISPLAY_ON, LCD_CMD_CURSOR_ON, LCD_CMD_CURSOR_BLINK_ON );
+    lcd_setEntryMode( LCD_CMD_EM_SHIFT_CURSOR, LCD_CMD_EM_INCREMENT );
+    lcd_clearEx();
 }
 
 void LCD_fullInit( void ) {
     // LCD control
-    LCD_preinit();
+    lcd_preinit();
     _delay_ms(50);
-    LCD_init4bit();
-    LCD_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );  
-    LCD_setDefaults();
+    lcd_init4bit();
+    lcd_setFunction( LCD_CMD_4_BIT, LCD_CMD_2_LINES, LCD_CMD_FONT_REGULAR );  
+    lcd_setDefaults();
     fputs( "\n\rLCD boot\n\r", &_LCD_output_raw );
-    LCD_setDefaults();
+    lcd_setDefaults();
 }
 
 void kbd_cycleLEDs( void ) {
@@ -62,7 +62,7 @@ int main( void ) {
     uart_printf( "\n\r" );
     uart_printf( "* UART: OK\n\r" );
     uart_printf( "* AT keyboard reset: %s\n\r",  kbd_reset() && kbd_testEcho() ? "OK" : "FAILED" );
-    LCD_fullInit();
+    lcd_fullInit();
     uart_printf( "* LCD: OK\n\r" );
 
     bool isShift = false;
@@ -107,7 +107,7 @@ int main( void ) {
                     break;
                 case KBD2(ESC): 
                     uart_printf( "\n\r Esc :: LCD reset...\n\r" );
-                    LCD_setDefaults();
+                    lcd_setDefaults();
                     break;
                 default: {
                     kbd_cycleLEDs();
@@ -120,13 +120,13 @@ int main( void ) {
                             break;
                         case '\t':
                             uart_putchar( key );
-                            LCD_setPosEx( ( lcdPos / 8 ) ? 0 : 8 );
+                            lcd_setPosEx( ( lcdPos / 8 ) ? 0 : 8 );
                             break;
                         case '\b':
                             fputs( "\b \b", uart_output );
-                            LCD_setPosEx( --lcdPos );
-                            LCD_putcharEx( ' ' );
-                            LCD_setPosEx( --lcdPos );
+                            lcd_setPosEx( --lcdPos );
+                            lcd_putcharEx( ' ' );
+                            lcd_setPosEx( --lcdPos );
                             break;
                         case '\n':
                             fputs( "\n\r", uart_output );
@@ -138,7 +138,7 @@ int main( void ) {
                             } else {
                                 cls = false;
                             }  
-                            LCD_clearEx();
+                            lcd_clearEx();
                             if ( cls ) {
                                 uart_printf( ESC"c" );
                             }
