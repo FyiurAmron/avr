@@ -1,6 +1,7 @@
 #ifndef _UART_H
 #define _UART_H  1
 // UART code
+#include <stdio.h>
 #include <avr/io.h>
 
 #ifndef BAUD

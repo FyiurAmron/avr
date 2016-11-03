@@ -16,8 +16,10 @@ int main( void ) {
     uart_stdio();
     printf( "\n\rUART device started: %ld %ld %d\n\r", UBRRH_VALUE, UBRRL_VALUE, USE_2X );
 
+    DDRB  |= BV(PB4);
+
     for(;;) {
-        uart_putchar( '* ' );
-        _delay_ms(1000);
+        PORTB = 0x00;
+        PORTB = 0xFF;
     }
 } // main()

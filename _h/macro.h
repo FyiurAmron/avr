@@ -44,6 +44,8 @@
 
 #define _delay_ticks(x)  for( volatile uint8_t _delayer = (x); _delayer > 0; _delayer-- )
 
+#define ARRAY_LENGTH(x)  ( sizeof(x) / sizeof(x[0]) )
+
 #ifdef DEBUG
 #define debug_printf(...)   printf( __VA_ARGS__ )
 #define debug_print_line()  printf( "dbg@%d ", __LINE__ );

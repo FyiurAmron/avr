@@ -17,7 +17,8 @@ int main( void ) {
     printf( "\n\rUART device started: %ld %ld %d\n\r", UBRRH_VALUE, UBRRL_VALUE, USE_2X );
 
     for(;;) {
-        uart_putchar( '* ' );
+        uart_putchar( '*' );
+        uart_putchar( ' ' );
         _delay_ms(1000);
     }
 } // main()
