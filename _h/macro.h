@@ -31,12 +31,15 @@
   (byte & 0x01 ? '1' : '0')
 
 #define bv8(x)                      ( (uint8_t)( 1<< (x) ) )
+
 #define bit8_and(x,y)               ( (uint8_t)( (uint8_t)(x) & (uint8_t)(y) ) )
 #define bit8_or(x,y)                ( (uint8_t)( (uint8_t)(x) | (uint8_t)(y) ) )
 #define bit8_xor(x,y)               ( (uint8_t)( (uint8_t)(x) ^ (uint8_t)(y) ) )
 #define bit8_not(x)                 ( (uint8_t)~(x) )
+
 #define bit8_set(x,y)               STATEMENT( (x) |= (uint8_t)(y); )
 #define bit8_clear(x,y)             STATEMENT( (x) &= bit8_not(y); )
+#define bit8_toggle(x,y)            STATEMENT( (x) ^= (uint8_t)(y); )
 // note that both |= & &= on uint8_t LHS doesn't require casts by themselves!
 #define bit8_if(c,x,y)              STATEMENT( if ( c ) { bit8_set(x,y); } else { bit8_clear(x,y); } )
 #define bit8_lsb(x)                 ( (uint8_t)( x & 1 ) )

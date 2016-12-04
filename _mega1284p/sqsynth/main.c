@@ -13,7 +13,8 @@
 
 // fine tune here:
 //#define PWM_FREQ  35000
-#define PWM_FREQ  51500
+#define PWM_FREQ  37000
+//#define PWM_FREQ  51500
 //#define PWM_FREQ  103000
 
 #include "freq.h"
