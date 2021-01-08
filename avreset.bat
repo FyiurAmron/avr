@@ -1,1 +1,1 @@
-@avrdude -p atmega1284p -P lpt1 -c dapa
+@avrdude -p atmega1284p -c usbasp -P usb

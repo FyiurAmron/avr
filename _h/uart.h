@@ -20,6 +20,7 @@ void uart_putchar( uint8_t c );
 
 #ifndef UART_NO_STREAMS
 #define uart_printf(...)  fprintf( uart_output, __VA_ARGS__ )
+#define uart_scanf(...)   fscanf( uart_input, __VA_ARGS__ )
 int _uart_getchar_FDEV( FILE *stream ); // internal
 int _uart_putchar_FDEV( char c, FILE *stream ); // internal
 
