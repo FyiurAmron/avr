@@ -41,9 +41,19 @@ int main( void ) {
     uart_init();
     uart_stdio();
 
-    // puts( "Q\r" );
-   
-    while(1) {
+    // LED + power test
+    for ( uint8_t i = 0; i < 6; i++ ) {
+        PORTC = 1 << i;
+        _delay_ms(100);
+    }
+    PORTC = 0;
+    _delay_ms(100);
+    PORTD = 0b00000100;
+    _delay_ms(100);
+    PORTD = 0;
+  
+    // main loop
+    while ( 1 ) {
         _delay_ms(500);
         sei();
 
@@ -60,7 +70,9 @@ int main( void ) {
         uint8_t vBat;
         uint8_t ampPercent;
         uint8_t beeper;
-        sscanf( buf, "(%d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*d.%*d %*c%*c%*c%*c%*c%*c%*c%c\r", &vIn, &ampPercent, &vBat, &beeper );
+        // note the vBat format SS.S is for stand-by UPS
+        // also workaround the TT.T returned as --.- for some UPSes (Quer anyone?)
+        sscanf( buf, "(%d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %*c%*c%*c%*c%*c%*c%*c%c\r", &vIn, &ampPercent, &vBat, &beeper );
 
              if ( vBat > 24 ) { portC = 0b00000001; portD = 0b00000000; }
         else if ( vBat > 20 ) { portC = 0b00000010; portD = 0b00000000; }
@@ -68,7 +80,7 @@ int main( void ) {
         else if ( vBat > 12 ) { portC = 0b00001000; portD = 0b00000000; }
         else if ( vBat >  8 ) { portC = 0b00010000; portD = 0b00000000; }
         else if ( vBat >  4 ) { portC = 0b00100000; portD = 0b00000000; }
-        else               { portC = 0b00000000; portD = 0b00000100; }
+        else                  { portC = 0b00000000; portD = 0b00000100; }
 
         if ( beeper == '1' ) {
             puts( "Q\r" );
