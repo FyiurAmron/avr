@@ -16,10 +16,10 @@ char buf[256];
 volatile uint8_t portC;
 volatile uint8_t portD;
 volatile uint8_t timeFlag;
-volatile uint16_t vIn;
+volatile uint8_t mainsDisconnected;
 
 ISR( TIMER1_OVF_vect ) {
-    if ( timeFlag && vIn == 0 ) {
+    if ( timeFlag && mainsDisconnected == '1' ) {
         PORTC = 0;
         PORTD = 0;
     } else {
@@ -83,17 +83,18 @@ int main( void ) {
 
         uint8_t vBat;
         uint8_t ampPercent;
+
         uint8_t beeper;
         // note the vBat format SS.S is for stand-by UPS
         // also workaround the TT.T returned as --.- for some UPSes (Quer anyone?)
-        sscanf( buf, "(%d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %*c%*c%*c%*c%*c%*c%*c%c\r", &vIn, &ampPercent, &vBat, &beeper );
+        sscanf( buf, "(%*d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %c%*c%*c%*c%*c%*c%*c%c\r", &ampPercent, &vBat, &mainsDisconnected, &beeper );
 
-             if ( vBat > 24 ) { portC = 0b00000001; portD = 0b00000000; }
-        else if ( vBat > 20 ) { portC = 0b00000010; portD = 0b00000000; }
-        else if ( vBat > 16 ) { portC = 0b00000100; portD = 0b00000000; }
-        else if ( vBat > 12 ) { portC = 0b00001000; portD = 0b00000000; }
-        else if ( vBat >  8 ) { portC = 0b00010000; portD = 0b00000000; }
-        else if ( vBat >  4 ) { portC = 0b00100000; portD = 0b00000000; }
+             if ( vBat > 26 ) { portC = 0b00000001; portD = 0b00000000; }
+        else if ( vBat > 25 ) { portC = 0b00000010; portD = 0b00000000; }
+        else if ( vBat > 24 ) { portC = 0b00000100; portD = 0b00000000; }
+        else if ( vBat > 23 ) { portC = 0b00001000; portD = 0b00000000; }
+        else if ( vBat > 22 ) { portC = 0b00010000; portD = 0b00000000; }
+        else if ( vBat > 21 ) { portC = 0b00100000; portD = 0b00000000; }
         else                  { portC = 0b00000000; portD = 0b00000100; }
 
         if ( beeper == '1' ) {
