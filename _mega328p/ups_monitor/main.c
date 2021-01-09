@@ -9,6 +9,8 @@
 #define BAUD  2400
 #include "vax/uart.h"
 
+#define PORTC_MAX  6
+
 char buf[256];
 
 volatile uint8_t portC;
@@ -29,6 +31,27 @@ ISR( TIMER1_OVF_vect ) {
     puts( "Q1\r" );
 }
 
+void startupTest( void ) {
+    for ( uint8_t i = 0; i < PORTC_MAX; i++ ) {
+        PORTC = 1 << i;
+        _delay_ms(100);
+    }
+    PORTC = 0;
+    _delay_ms(100);
+    PORTD = 0b00000100;
+    _delay_ms(100);
+    PORTD = 0;
+    _delay_ms(100);
+    PORTD = 0b00000100;
+    _delay_ms(100);
+    PORTD = 0;
+    for ( int8_t i = PORTC_MAX - 1; i >= 0; i-- ) {
+        PORTC = 1 << i;
+        _delay_ms(100);
+    }
+    PORTC = 0;
+}
+
 int main( void ) {
     // DDRA = 0;
     DDRB = 0;
@@ -41,16 +64,7 @@ int main( void ) {
     uart_init();
     uart_stdio();
 
-    // LED + power test
-    for ( uint8_t i = 0; i < 6; i++ ) {
-        PORTC = 1 << i;
-        _delay_ms(100);
-    }
-    PORTC = 0;
-    _delay_ms(100);
-    PORTD = 0b00000100;
-    _delay_ms(100);
-    PORTD = 0;
+    startupTest(); // LED + power test
   
     // main loop
     while ( 1 ) {
