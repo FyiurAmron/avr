@@ -2,6 +2,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 #include <util/delay.h>
 
 #define COMPILE_SINGLE_FILE
@@ -17,6 +18,8 @@ volatile uint8_t portC;
 volatile uint8_t portD;
 volatile uint8_t timeFlag;
 volatile uint8_t mainsDisconnected;
+
+uint8_t EEMEM vThreshold = 21;
 
 ISR( TIMER1_OVF_vect ) {
     if ( timeFlag && mainsDisconnected == '1' ) {
@@ -85,17 +88,30 @@ int main( void ) {
         uint8_t ampPercent;
 
         uint8_t beeper;
+        uint8_t cmdChar;
         // note the vBat format SS.S is for stand-by UPS
         // also workaround the TT.T returned as --.- for some UPSes (Quer anyone?)
-        sscanf( buf, "(%*d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %c%*c%*c%*c%*c%*c%*c%c\r", &ampPercent, &vBat, &mainsDisconnected, &beeper );
+        sscanf( buf, "%c%*d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %c%*c%*c%*c%*c%*c%*c%c\r",
+                &cmdChar, &ampPercent, &vBat, &mainsDisconnected, &beeper );
 
-             if ( vBat > 26 ) { portC = 0b00000001; portD = 0b00000000; }
-        else if ( vBat > 25 ) { portC = 0b00000010; portD = 0b00000000; }
-        else if ( vBat > 24 ) { portC = 0b00000100; portD = 0b00000000; }
-        else if ( vBat > 23 ) { portC = 0b00001000; portD = 0b00000000; }
-        else if ( vBat > 22 ) { portC = 0b00010000; portD = 0b00000000; }
-        else if ( vBat > 21 ) { portC = 0b00100000; portD = 0b00000000; }
-        else                  { portC = 0b00000000; portD = 0b00000100; }
+        switch ( cmdChar ) {
+          case '(': { // the actual command we get from the UPS
+            int8_t vDiff = vBat - eeprom_read_byte( &vThreshold );
+
+                 if ( vDiff > 5 ) { portC = 0b00000001; portD = 0b00000000; }
+            else if ( vDiff > 4 ) { portC = 0b00000010; portD = 0b00000000; }
+            else if ( vDiff > 3 ) { portC = 0b00000100; portD = 0b00000000; }
+            else if ( vDiff > 2 ) { portC = 0b00001000; portD = 0b00000000; }
+            else if ( vDiff > 1 ) { portC = 0b00010000; portD = 0b00000000; }
+            else if ( vDiff > 0 ) { portC = 0b00100000; portD = 0b00000000; }
+            else                  { portC = 0b00000000; portD = 0b00000100; }
+            break;
+          }
+          case '!': { // setting vThreshold via direct UART connection, e.g.
+            eeprom_write_byte( &vThreshold, vBat ); // !0.0 0.0 0.0 000 0.0 21.0 --.- 00000000
+            break; // would set the threshold to 21V
+          }
+        }
 
         if ( beeper == '1' ) {
             puts( "Q\r" );

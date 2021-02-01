@@ -611,7 +611,7 @@ cleanish_list :
 	@echo
 	@echo $(MSG_CLEANING)
 	$(REMOVE) $(TARGET).hex
-	$(REMOVE) $(TARGET).eep
+#	$(REMOVE) $(TARGET).eep
 	$(REMOVE) $(TARGET).cof
 #	$(REMOVE) $(TARGET).elf
 	$(REMOVE) $(TARGET).map
