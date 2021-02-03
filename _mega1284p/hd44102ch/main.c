@@ -10,7 +10,8 @@
 #define COMPILE_SINGLE_FILE
 #include "vax/misc.h"
 #include "vax/bits.h"
-#define BAUD  2500000
+//#define BAUD  2500000
+#define BAUD  460800
 #include "vax/uart.h"
 
 // LCD common defines
@@ -85,10 +86,10 @@ void lcd_cls( void ) {
     PORTDB = 0;
 
     for( uint8_t y = 0; y < LCD_ROWS; y++ ) {
-        sbi( PORTCMD, DI );
+        cbi( PORTCMD, DI );
         PORTDB = y << 6;
         lcd_strobeE();
-        cbi( PORTCMD, DI );
+        sbi( PORTCMD, DI );
         PORTDB = 0;
         for( uint8_t x = 0; x < LCD_COLUMNS; x++ ) {
             lcd_strobeE();
@@ -122,9 +123,9 @@ void lcd_displayImage( const __flash uint8_t* image ) {
 
 void scrollScreen( void ) {
     PORTCMD = 0b01111000;
-    PORTDB  = ( i << 6 ) | 0b00111110;
     for( uint8_t i = 0; i < 4; i++ ) {
         _delay_ms(250);
+        PORTDB  = ( i << 6 ) | 0b00111110;
         lcd_strobeE();
     }
 }
@@ -150,14 +151,51 @@ int main( void ) {
     PORTDB = LCD_CMD_DISPLAY_START_PAGE_A;
     lcd_strobeE();
 
+    _delay_ms(20);
+
     lcd_cls();
 
-    lcd_displayImage( contra_logo_min );
+    _delay_ms(20);
+
+    //lcd_displayImage( contra_logo_min );
+
+    PORTCMD = 0b01111000;
+    PORTDB = 0x00; // pos 0/0
+    lcd_strobeE();
+    PORTCMD = 0;
+    sbi( PORTCMD, CSEL1 );
+    sbi( PORTCMD, DI );
+
+    uint8_t bank = 0;
+    uint8_t x = 0;
+    uint8_t y = 0;
+
+    uint8_t c; // = 0b10101010;
 
     while(1) {
-        PORTDB = uart_getchar();
-        uart_putchar( PORTDB );
+        c = uart_getchar();
+        PORTDB = c;
         lcd_strobeE();
-        // scrollScreen();
+        x++;
+        if ( x == LCD_MAX_X ) { // next bank
+            cbi( PORTCMD, DI );
+            x = 0;
+            bank++;
+            if ( bank == LCD_MAX_BANK ) {
+                bank = 0;
+                y++;
+                if ( y == LCD_MAX_Y ) {
+                    y = 0;
+                    c = ~c;
+                }
+                lcd_strobeE();
+            }
+            PORTCMD = 1 << ( bank + CSEL1 );
+            PORTDB = y << 6 | x;
+            lcd_strobeE();
+            sbi( PORTCMD, DI );
+        }
+        uart_putchar( c );
+        //_delay_us(100);
     }
 } // main()
