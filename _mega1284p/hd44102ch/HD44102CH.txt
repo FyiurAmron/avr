@@ -1,0 +1,29 @@
+HDP-32GS20C-A
+
+BS = Low (8-bit)
+V1 = Vee
+RST = High (no reset)
+CS1 = Low
+CS3 = High
+
+from left:
+
+01: V2 (contrast)
+02: DB7
+03: DB6
+04: DB5
+05: DB4
+06: DB3
+07: DB2
+08: DB1
+09: DB0
+10: R/W
+11: E
+12: D/I
+13: CS2-4
+14: CS2-3
+15: CS2-2
+16: CS2-1
+17: GND
+18: Vee
+19: Vcc
