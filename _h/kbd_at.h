@@ -5,18 +5,18 @@
 #error "missing one or more needed definitions: KBD_CLK_LINE, KBD_CLK_PIN_NR, KBD_DATA_LINE, KBD_DATA_PIN_NR"
 #else
 
-#include "macro.h"
+#include "bits.h"
 #include "kbd_at_set2.h"
 
-#define KBD_CLK       BV(KBD_CLK_PIN_NR)
-#define KBD_DATA      BV(KBD_DATA_PIN_NR)
+#define KBD_CLK       _BV(KBD_CLK_PIN_NR)
+#define KBD_DATA      _BV(KBD_DATA_PIN_NR)
 #define KBD_CLK_PIN   bit8_and( xPIN(KBD_CLK_LINE), KBD_CLK )
 #define KBD_DATA_PIN  bit8_and( xPIN(KBD_DATA_LINE), KBD_DATA )
 #define KBD_DATA_BIT  ( KBD_DATA_PIN >> KBD_DATA_PIN_NR )
 
-#define KBD_LED_SCROLL_LOCK  BV(0)
-#define KBD_LED_NUM_LOCK     BV(1)
-#define KBD_LED_CAPS_LOCK    BV(2)
+#define KBD_LED_SCROLL_LOCK  _BV(0)
+#define KBD_LED_NUM_LOCK     _BV(1)
+#define KBD_LED_CAPS_LOCK    _BV(2)
 
 #ifndef KBD_INT
 #define KBD_INT       INT0

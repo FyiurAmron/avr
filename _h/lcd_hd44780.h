@@ -9,7 +9,7 @@
 #error "missing one or more needed definitions: LCD_DATA_LINE, LCD_CTRL_LINE, LCD_RS_PIN_NR, LCD_RW_PIN_NR, LCD_E_PIN_NR"
 #else
 
-#include "macro.h"
+#include "bits.h"
 
 #define LCD_E   BV(LCD_E_PIN_NR)
 #define LCD_RS  BV(LCD_RS_PIN_NR)

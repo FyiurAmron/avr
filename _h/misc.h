@@ -3,6 +3,7 @@
 // misc utils
 #include <avr/wdt.h>
 #include <avr/io.h>
+#include <stdbool.h>
 #include "macro.h"
 
 #define soft_reset()  STATEMENT( wdt_enable(WDTO_15MS); for(;;) {} )

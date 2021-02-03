@@ -7,7 +7,7 @@
 #error "missing one or more needed definitions: SPI_SCK_LINE, SPI_SCK_PIN_NR, SPI_MISO_LINE, SPI_MISO_PIN_NR, SPI_MOSI_LINE, SPI_MOSI_PIN_NR"
 #else
 #include <avr/io.h>
-#include "macro.h"
+#include "bits.h"
 
 #define SPI_SCK          BV(SPI_SCK_PIN_NR)
 #define SPI_MISO         BV(SPI_MISO_PIN_NR)

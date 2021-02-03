@@ -1,4 +1,4 @@
-
+#include "bits.h"
 #include "dist_hc_sr04.h"
 //
 uint8_t dist_init( void ) {
