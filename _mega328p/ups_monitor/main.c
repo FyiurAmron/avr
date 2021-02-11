@@ -92,7 +92,7 @@ int main( void ) {
         // note the vBat format SS.S is for stand-by UPS
         // also workaround the TT.T returned as --.- for some UPSes (Quer anyone?)
         sscanf( buf, "%c%*d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %c%*c%*c%*c%*c%*c%*c%c\r",
-                &cmdChar, &ampPercent, &vBat, &mainsDisconnected, &beeper );
+                     &cmdChar, &ampPercent, &vBat, &mainsDisconnected, &beeper );
 
         switch ( cmdChar ) {
           case '(': { // the actual command we get from the UPS
