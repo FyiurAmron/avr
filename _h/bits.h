@@ -9,13 +9,16 @@
 // bit_is_set
 // bit_is_clear
 
-#define bit_set_to(port, bit, value)  { \
+#define bit_set_to(port, bit, value) \
+do { \
     if ( value ) { \
-	    sbi( where, what ); \
+	    sbi( port, bit ); \
     } else { \
-        cbi( where, what ); \
+        cbi( port, bit ); \
     } \
-}
+} while ( 0 )
+
+#define bi  bit_set_to
 
 #define bv8(x)                      ( (uint8_t)( 1<< (x) ) )
 
