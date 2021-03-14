@@ -1,0 +1,11 @@
+---
+|x| [5] GND - BROWN
+| 
+|x| [4] 5V  - RED
+| |
+|x| [3] Rx  - ORANGE
+| |
+|x| [2] Tx  - GREEN
+| 
+|x| [7] 12V - YELLOW
+---

@@ -12,6 +12,8 @@
 
 #define PORTC_MAX  6
 
+#define TEST_DELAY  100
+
 char buf[256];
 
 volatile uint8_t portC;
@@ -37,20 +39,20 @@ ISR( TIMER1_OVF_vect ) {
 void startupTest( void ) {
     for ( uint8_t i = 0; i < PORTC_MAX; i++ ) {
         PORTC = 1 << i;
-        _delay_ms(100);
+        _delay_ms( TEST_DELAY );
     }
     PORTC = 0;
-    _delay_ms(100);
+    _delay_ms( TEST_DELAY );
     PORTD = 0b00000100;
-    _delay_ms(100);
+    _delay_ms( TEST_DELAY );
     PORTD = 0;
-    _delay_ms(100);
+    _delay_ms( TEST_DELAY );
     PORTD = 0b00000100;
-    _delay_ms(100);
+    _delay_ms( TEST_DELAY );
     PORTD = 0;
     for ( int8_t i = PORTC_MAX - 1; i >= 0; i-- ) {
         PORTC = 1 << i;
-        _delay_ms(100);
+        _delay_ms( TEST_DELAY );
     }
     PORTC = 0;
 }
