@@ -103,51 +103,18 @@ int main( void ) {
     TCNT2 = 0;
 
     // main loop
-    uint8_t red = 0, green = 0, blue = 0;
-    uint8_t step = 0;
+    volatile uint8_t* rgb[] = { &OCR0A, &OCR1A, &OCR2B };
     uint8_t i = 0;
+    uint8_t rise = 1;
+    uint8_t idx = 0;
     while ( 1 ) {
-        switch ( step ) {
-            case 0:
-                // red = PWM_MAX;
-                green = i;
-                // blue = 0;
-                break;
-            case 1:
-                red = PWM_MAX - i;
-                // green = PWM_MAX;
-                // blue = 0;
-                break;
-            case 2:
-                // red = 0;
-                // green = PWM_MAX;
-                blue = i;
-                break;
-            case 3:
-                // red = 0;
-                green = PWM_MAX - i;
-                // blue = PWM_MAX;
-                break;
-            case 4:
-                red = i;
-                // green = 0;
-                // blue = PWM_MAX;
-                break;
-            case 5:
-                // red = PWM_MAX;
-                // green = 0;
-                blue = PWM_MAX - i;
-                break;
-        }
-
-        OCR0A = red;
-        OCR1A = green;
-        OCR2B = blue;
+        *(rgb[idx]) = rise ? i : PWM_MAX - i;
 
         if ( i == PWM_MAX ) {
-            step++;
-            if ( step > 5 ) {
-                step = 0;
+            rise = !rise;
+            idx++;
+            if ( idx >= ARRAY_LENGTH( rgb ) ) {
+                idx = 0;
             }
             i = 0;
         } else {
