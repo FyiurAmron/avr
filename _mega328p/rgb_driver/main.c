@@ -109,32 +109,32 @@ int main( void ) {
     while ( 1 ) {
         switch ( step ) {
             case 0:
-                red = PWM_MAX;
+                // red = PWM_MAX;
                 green = i;
                 // blue = 0;
                 break;
             case 1:
                 red = PWM_MAX - i;
-                green = PWM_MAX;
+                // green = PWM_MAX;
                 // blue = 0;
                 break;
             case 2:
                 // red = 0;
-                green = PWM_MAX;
+                // green = PWM_MAX;
                 blue = i;
                 break;
             case 3:
                 // red = 0;
                 green = PWM_MAX - i;
-                blue = PWM_MAX;
+                // blue = PWM_MAX;
                 break;
             case 4:
                 red = i;
                 // green = 0;
-                blue = PWM_MAX;
+                // blue = PWM_MAX;
                 break;
             case 5:
-                red = PWM_MAX;
+                // red = PWM_MAX;
                 // green = 0;
                 blue = PWM_MAX - i;
                 break;
