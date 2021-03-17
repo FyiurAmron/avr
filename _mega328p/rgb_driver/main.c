@@ -21,16 +21,38 @@ ISR( TIMER1_OVF_vect ) {
 }
 */
 
-#define BASE_DELAY  100
+volatile uint8_t* rgb[] = {
+    // &OCR0A, &OCR1A, &OCR2B  // Vishay RGB (CC)
+    &OCR1A, &OCR0A, &OCR2B // makeshift RGB (CA)
+};
 
-void setBasicColor( uint8_t red, uint8_t green, uint8_t blue ) {
+/*
+// Vishay RGB (CC)
+void setRgb( uint8_t red, uint8_t green, uint8_t blue ) {
     bi( PORTD, 6, red );
     bi( PORTB, 1, green );
     bi( PORTD, 3, blue );
 }
+*/
 
-void setBasicColorArray( uint8_t rgb[3] ) {
-    setBasicColor( rgb[0], rgb[1], rgb[2] );
+// MOSFET CA
+void setRgb( uint8_t red, uint8_t green, uint8_t blue ) {
+    bi( PORTB, 1, red );
+    bi( PORTD, 6, green );
+    bi( PORTD, 3, blue );
+}
+
+void setRgbArray( uint8_t rgb[3] ) {
+    setRgb( rgb[0], rgb[1], rgb[2] );
+}
+
+void setRgbPwm( uint8_t idx, uint8_t val ) {
+/*
+    if ( idx == 2 ) { // superbright blue fix
+        val = val / 12;
+    }
+*/
+    *(rgb[idx]) = val;
 }
 
 uint8_t TEST_SEQUENCE[][3] = {
@@ -62,12 +84,12 @@ uint8_t TEST_SEQUENCE[][3] = {
 
 void startupTest( void ) {
     for( uint8_t i = 0; i < ARRAY_LENGTH( TEST_SEQUENCE ); i++ ) {
-        setBasicColorArray( TEST_SEQUENCE[i] );
-        _delay_ms( BASE_DELAY );
+        setRgbArray( TEST_SEQUENCE[i] );
+        _delay_ms( 100 );
     }
 }
 
-#define PWM_MAX  100
+#define PWM_MAX  255
 
 int main( void ) {
     // DDRA = 0;
@@ -81,34 +103,46 @@ int main( void ) {
     uart_init();
     uart_stdio();
 
-    // startupTest(); // LED + power test
+    startupTest(); // LED + power test
+    setRgb( 0, 0, 0 );
 
-    sbi( TCCR0A, WGM00 ); // Fast PWM, full 8-bit (1)
-    sbi( TCCR0A, WGM01 ); // Fast PWM, full 8-bit (2)
-    sbi( TCCR0A, COM0A1 ); // enable OCR0B Fast PWM: Clear on Compare Match, set at TOP
-	sbi( TCCR0B, CS00 ); // /1 prescaler
+    // PD6 - 8-bit
+    sbi( TCCR0A, WGM00 ); // PWM
+    sbi( TCCR0A, COM0A1 ); // enable OCR0A Phase Correct PWM
+	sbi( TCCR0B, CS00 ); //
+    sbi( TCCR0B, CS01 ); // /64 prescaler ~ 500 Hz
 
-    sbi( TCCR1A, WGM10 ); // Fast PWM, full 8-bit (1)
-    sbi( TCCR1A, WGM11 ); // Fast PWM, full 8-bit (2)
-    sbi( TCCR1A, COM1A1 ); // enable OCR0B Fast PWM: Clear on Compare Match, set at TOP
-	sbi( TCCR1B, CS10 ); // /1 prescaler
+    // PB1 - 16-bit
+    sbi( TCCR1A, WGM10 ); // PWM
+    sbi( TCCR1A, COM1A1 ); // enable OCR1A Phase Correct 8-bit PWM
+	sbi( TCCR1B, CS10 ); //
+    sbi( TCCR1B, CS11 ); // /64 prescaler ~ 500 Hz
 
-    sbi( TCCR2A, WGM20 ); // Fast PWM, full 8-bit (1)
-    sbi( TCCR2A, WGM21 ); // Fast PWM, full 8-bit (2)
-    sbi( TCCR2A, COM2B1 ); // enable OCR0B Fast PWM: Clear on Compare Match, set at TOP
-	sbi( TCCR2B, CS20 ); // /1 prescaler
+    // PD3 - 8-bit
+    sbi( TCCR2A, WGM20 ); // PWM
+    sbi( TCCR2A, COM2B1 ); // enable OCR2B Phase Correct PWM
+	sbi( TCCR2B, CS20 ); //
+    sbi( TCCR2B, CS21 ); // /64 prescaler ~ 500 Hz
 
+    /*
     TCNT0 = 0;
     TCNT1 = 0;
     TCNT2 = 0;
+    */
 
     // main loop
-    volatile uint8_t* rgb[] = { &OCR0A, &OCR1A, &OCR2B };
+
     uint8_t i = 0;
     uint8_t rise = 1;
     uint8_t idx = 0;
+
+
+    for( uint8_t i = 0; i < ARRAY_LENGTH( rgb ); i++ ) {
+        setRgbPwm( i, 0 );
+    }
+
     while ( 1 ) {
-        *(rgb[idx]) = rise ? i : PWM_MAX - i;
+        setRgbPwm( idx, rise ? i : PWM_MAX - i );
 
         if ( i == PWM_MAX ) {
             rise = !rise;
@@ -121,7 +155,7 @@ int main( void ) {
             i++;
         }
 
-        _delay_ms(5);
+        _delay_ms(1);
 
         // sei();
 /*
@@ -134,11 +168,10 @@ int main( void ) {
         buf[i] = '\0';
 */
         // cli();
-
-//        sscanf( buf, "%c%*d.%*d %*d.%*d %*d.%*d %hhu %*d.%*d %hhu.%*d %*c%*c.%*c %c%*c%*c%*c%*c%*c%*c%c\r",
-//                     &cmdChar, &ampPercent, &vBat, &mainsDisconnected, &beeper );
-
-//        switch ( cmdChar ) {
-//        }
+/*
+        sscanf( buf, "%d,%d,%d\r", &r, &g, &b );
+        switch ( cmdChar ) {
+        }
+*/
   }
 }
