@@ -23,7 +23,8 @@ ISR( TIMER1_OVF_vect ) {
 
 volatile uint8_t* rgb[] = {
     // &OCR0A, &OCR1A, &OCR2B  // Vishay RGB (CC)
-    &OCR1A, &OCR0A, &OCR2B // makeshift RGB (CA)
+    // &OCR1A, &OCR0A, &OCR2B // makeshift RGB (CA)
+    &OCR0A, &OCR2B, &OCR1A // LED strip
 };
 
 /*
@@ -130,48 +131,66 @@ int main( void ) {
     TCNT2 = 0;
     */
 
-    // main loop
-
     uint8_t i = 0;
     uint8_t rise = 1;
     uint8_t idx = 0;
-
 
     for( uint8_t i = 0; i < ARRAY_LENGTH( rgb ); i++ ) {
         setRgbPwm( i, 0 );
     }
 
-    while ( 1 ) {
-        setRgbPwm( idx, rise ? i : PWM_MAX - i );
+    uint8_t rgbLoop = 0;
 
-        if ( i == PWM_MAX ) {
-            rise = !rise;
-            idx++;
-            if ( idx >= ARRAY_LENGTH( rgb ) ) {
-                idx = 0;
+    // main loop
+
+    while ( 1 ) {
+        if ( rgbLoop ) {
+            setRgbPwm( idx, rise ? i : PWM_MAX - i );
+
+            if ( i == PWM_MAX ) {
+                rise = !rise;
+                idx++;
+                if ( idx >= ARRAY_LENGTH( rgb ) ) {
+                    idx = 0;
+                }
+                i = 0;
+            } else {
+                i++;
             }
-            i = 0;
-        } else {
-            i++;
+
+            _delay_ms(1);
+            continue;
         }
 
-        _delay_ms(1);
-
         // sei();
-/*
+
         uint8_t i = 0;
         char c = '\0';
         while ( c != '\r' ) {
           c = uart_getchar();
+          uart_putchar( c ); // ECHO ON
           buf[i++] = c;
         }
         buf[i] = '\0';
-*/
+
         // cli();
-/*
-        sscanf( buf, "%d,%d,%d\r", &r, &g, &b );
+
+        uint8_t cmdChar, val, idx;
+        sscanf( buf, "%c%hhu\r", &cmdChar, &val );
+
         switch ( cmdChar ) {
+          case 'R': idx =   0; break;
+          case 'G': idx =   1; break;
+          case 'B': idx =   2; break;
+          case '@': idx =   3; break;
+          default:  idx = 255; break;
         }
-*/
+
+        if ( idx <= 2 ) {
+            setRgbPwm( idx, val );
+        }
+        if ( idx == 3 ) {
+            rgbLoop = 1;
+        }
   }
 }
