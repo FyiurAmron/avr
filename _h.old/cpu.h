@@ -1,3 +1,0 @@
-//#define F_CPU  1000000UL
-//#define F_CPU  8000000UL
-#define F_CPU  20000000UL
