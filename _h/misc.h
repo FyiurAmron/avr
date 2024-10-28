@@ -8,7 +8,15 @@
 
 #define soft_reset()  STATEMENT( wdt_enable(WDTO_15MS); for(;;) {} )
 
-#define init()  MCUSR = 0; wdt_disable(); \
+#define init init1248p
+
+#define init328p() \
+                MCUSR = 0; wdt_disable(); \
+                /* DDRA = 0; */ DDRB = 0; DDRC = 0; DDRD = 0; \
+                /* PORTA = 0; */ PORTB = 0; PORTC = 0; PORTD = 0
+
+#define init1248p() \
+                MCUSR = 0; wdt_disable(); \
                 MCUCR = BV( JTD ); MCUCR = BV( JTD ); \
                 DDRA = 0; DDRB = 0; DDRC = 0; DDRD = 0; \
                 PORTA = 0; PORTB = 0; PORTC = 0; PORTD = 0
